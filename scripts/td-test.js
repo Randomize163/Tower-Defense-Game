@@ -1,3 +1,7 @@
+import {CMapTest} from './td-map.js';
+
+const TEST_CONFIG_ADD_TIMEOUT = false;
+
 class CTest 
 {
     static run()
@@ -6,10 +10,9 @@ class CTest
     }
 }
 
-if (1) {
-    setTimeout(function(){ CTest.run(); }, 6000);
+if (TEST_CONFIG_ADD_TIMEOUT) {
+    setTimeout(function(){ CTest.run(); }, 3000);
 }
-else
-{
+else {
     CTest.run();
 }

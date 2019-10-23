@@ -86,7 +86,7 @@ class Stack
 
 class CMazeGenerator 
 {
-    generateMaze(width, height)
+    static generateMaze(width, height)
     {
         let maze = Array.from(Array(width), () => new Array(height));
         for (let i = 0; i < maze.length; i++)
@@ -177,7 +177,7 @@ class CMazeGenerator
         return maze;
     }
 
-    transformMazeToPixels(maze)
+    static transformMazeToPixels(maze, addInternalWall = false)
     {
         let result = Array.from({length: maze.length * 4 + 1}, e => Array(maze[0].length * 4 + 1).fill(TilesType.path));         
 
@@ -185,16 +185,22 @@ class CMazeGenerator
         {
             for (let j = 0; j < maze[0].length; j++)
             {
-                this.transformTileToPixels(result, i, j, maze[i][j]);
+                this.transformTileToPixels(result, i, j, maze[i][j], addInternalWall);
             }
         }
 
         return result;
     }
 
-    transformTileToPixels(result, i, j, tile)
+    static transformTileToPixels(result, i, j, tile, addInternalWall = false)
     {
         let [pixelTileCenterX, pixelTileCenterY] = [2 + 4*i, 2 + 4*j];
+
+        if (addInternalWall)
+        {
+            result[pixelTileCenterX][pixelTileCenterY] = TilesType.empty;
+        }
+
 
         if ((tile.walls & WallsType.left) != 0)
         {
@@ -203,6 +209,11 @@ class CMazeGenerator
             result[pixelTileCenterX - 2][pixelTileCenterY - 2] = TilesType.empty;
             result[pixelTileCenterX - 2][pixelTileCenterY + 1] = TilesType.empty;
             result[pixelTileCenterX - 2][pixelTileCenterY + 2] = TilesType.empty;
+        }
+        else if (addInternalWall)
+        {
+            result[pixelTileCenterX - 1][pixelTileCenterY] = TilesType.empty;
+            result[pixelTileCenterX - 2][pixelTileCenterY] = TilesType.empty;
         }
 
         if ((tile.walls & WallsType.right) != 0)
@@ -213,6 +224,11 @@ class CMazeGenerator
             result[pixelTileCenterX + 2][pixelTileCenterY - 2] = TilesType.empty;
             result[pixelTileCenterX + 2][pixelTileCenterY + 2] = TilesType.empty;
         }
+        else if (addInternalWall)
+        {
+            result[pixelTileCenterX + 1][pixelTileCenterY] = TilesType.empty;
+            result[pixelTileCenterX + 2][pixelTileCenterY] = TilesType.empty;
+        }
 
         if ((tile.walls & WallsType.up) != 0)
         {
@@ -221,6 +237,11 @@ class CMazeGenerator
             result[pixelTileCenterX - 1][pixelTileCenterY + 2] = TilesType.empty;
             result[pixelTileCenterX + 2][pixelTileCenterY + 2] = TilesType.empty;
             result[pixelTileCenterX - 2][pixelTileCenterY + 2] = TilesType.empty;
+        }
+        else if (addInternalWall)
+        {
+            result[pixelTileCenterX][pixelTileCenterY + 1] = TilesType.empty;
+            result[pixelTileCenterX][pixelTileCenterY + 2] = TilesType.empty;
         }
 
         if ((tile.walls & WallsType.down) != 0)
@@ -231,27 +252,79 @@ class CMazeGenerator
             result[pixelTileCenterX + 2][pixelTileCenterY - 2] = TilesType.empty;
             result[pixelTileCenterX - 2][pixelTileCenterY - 2] = TilesType.empty;
         }
+        else if (addInternalWall)
+        {
+            result[pixelTileCenterX][pixelTileCenterY - 1] = TilesType.empty;
+            result[pixelTileCenterX][pixelTileCenterY - 2] = TilesType.empty;
+        }
 
         return result;
     }
 
-    generatePixelMaze(width, height)
+    static generatePixelMaze(width, height, addInternalWall = false)
     {
-        return this.transformMazeToPixels(this.generateMaze(width, height))
+        return this.transformMazeToPixels(this.generateMaze(width, height), addInternalWall)
+    }
+
+    static printPixelMaze(pixelMaze)
+    {
+        console.log("Print Maze (width: " + pixelMaze.length + ", length: " + pixelMaze[0].length + "):");
+        
+        const maze = this.pixelMazeToString(pixelMaze);
+
+        console.log(maze);
+    }
+
+    static pixelMazeToString(pixelMaze)
+    {
+        let maze = "";
+        for (let i = 0; i < pixelMaze.length; i++) 
+        {
+            for (let j = 0; j < pixelMaze[0].length; j++)
+            {
+                switch (pixelMaze[i][j])
+                {
+                    case TilesType.empty:
+                        maze += "▇";
+                        break;
+                    case TilesType.path:
+                        maze += "　";
+                        break;
+                    default:
+                        console.error("Unprintable tile type: " + pixelMaze[i][j]);
+                        debugger;
+                }
+            }
+
+            maze += "\n";
+        }
+
+        return maze;
+    }
+
+    static printPixelMazeToHtml(pixelMaze)
+    {
+        const maze = this.pixelMazeToString(pixelMaze);
+        let out = document.getElementById("output");
+
+		out.innerHTML = maze;
     }
 
     static test()
     {
-        const mazeGenerator = new CMazeGenerator();
-        console.log(mazeGenerator.generateMaze(5,5));
-        console.log(mazeGenerator.generateMaze(50,50));
-        console.log(mazeGenerator.generateMaze(500,500));
+        console.log(CMazeGenerator.generateMaze(5,5));
+        console.log(CMazeGenerator.generateMaze(50,50));
+        console.log(CMazeGenerator.generateMaze(500,500));
         //console.log(mazeGenerator.generateMaze(5000,5000));
-        console.log(mazeGenerator.generatePixelMaze(5,5));  
+        this.printPixelMaze(CMazeGenerator.generatePixelMaze(10, 10, true));  
+        this.printPixelMaze(CMazeGenerator.generatePixelMaze(3, 3, true));  
+        //this.printPixelMaze(mazeGenerator.generatePixelMaze(100, 100, true));  
+        //this.printPixelMazeToHtml(mazeGenerator.generatePixelMaze(50, 50, true));
+
     }
 }
 
-class CMapTest {
+export class CMapTest {
     static run()
     {
         CMazeGenerator.test();

@@ -1,4 +1,5 @@
 import {CMapTest} from './td-map.js';
+import {CUtilsTest} from './td-utils.js';
 
 const TEST_CONFIG_ADD_TIMEOUT = false;
 
@@ -7,6 +8,7 @@ class CTest
     static run()
     {
        CMapTest.run(); 
+       CUtilsTest.run();
     }
 }
 

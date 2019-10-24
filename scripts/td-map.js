@@ -1,3 +1,5 @@
+import {CUtils} from './td-utils.js';
+
 const TilesType = Object.freeze(
     {
         "empty":1, 
@@ -117,7 +119,7 @@ class CMaze
     {
         let visited = Array.from(Array(this.width), () => new Array(this.height).fill(false));
         let stack = new Stack();
-        let startPosition = [Math.floor(Math.random() * this.width), Math.floor(Math.random() * this.height)];
+        let startPosition = [CUtils.randomInt(0, this.width), CUtils.randomInt(0, this.height)];
         
         stack.push(startPosition);
 
@@ -140,7 +142,7 @@ class CMaze
             }
 
             // choose next
-            let selectedNext = nexts[Math.floor(Math.random() * nexts.length)];
+            let selectedNext = nexts[CUtils.randomInt(0, nexts.length)];
             
             // break the wall
             let [nextX, nextY] = selectedNext.position;
@@ -275,14 +277,14 @@ class CMaze
         }
     }
 
-    mazePixelsToString()
+    static mazePixelsToString(mazePixels)
     {
         let maze = "";
-        for (let i = 0; i < this.mazePixels.length; i++) 
+        for (let i = 0; i < mazePixels.length; i++) 
         {
-            for (let j = 0; j < this.mazePixels[0].length; j++)
+            for (let j = 0; j < mazePixels[0].length; j++)
             {
-                switch (this.mazePixels[i][j])
+                switch (mazePixels[i][j])
                 {
                     case TilesType.empty:
                         maze += "▇";
@@ -290,8 +292,14 @@ class CMaze
                     case TilesType.path:
                         maze += "　";
                         break;
+                    case TilesType.base:
+                        maze += "B";
+                        break;
+                    case TilesType.spawn:
+                        maze += "S";
+                        break;        
                     default:
-                        console.error("Unprintable tile type: " + this.mazePixels[i][j]);
+                        console.error("Unprintable tile type: " + mazePixels[i][j]);
                         debugger;
                 }
             }
@@ -302,30 +310,30 @@ class CMaze
         return maze;
     }
 
-    consoleLogmazePixels()
+    consoleLogMazePixels()
     {
         console.log("Print Maze (width: " + this.mazePixels.length + ", length: " + this.mazePixels[0].length + "):");
-        console.log(this.mazePixelsToString());
+        console.log(CMaze.mazePixelsToString(this.mazePixels));
     }
 
-    printmazePixelsToHtml(elementId)
+    printMazePixelsToHtml(elementId)
     {
         let outputElement = document.getElementById(elementId);
-        outputElement.innerHTML = this.mazePixelsToString();
+        outputElement.innerHTML = CMaze.mazePixelsToString(this.mazePixels);
     }
 
     static simpleTest()
     {
-        new CMaze(3,3).consoleLogmazePixels();
-        new CMaze(5,10).consoleLogmazePixels();
+        new CMaze(3,3).consoleLogMazePixels();
+        new CMaze(5,10).consoleLogMazePixels();
     }
 
     static longTest()
     {
         for (let i = 0; i < 10000; i++)
         {
-            const width = 2 + Math.floor(Math.random() * 500);
-            const height = 2 + Math.floor(Math.random() * 500);
+            const width = CUtils.randomInt(2, 500);
+            const height = CUtils.randomInt(2, 500);
             new CMaze(width, height);
 
             if (i % 100 == 0)

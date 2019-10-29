@@ -1,5 +1,4 @@
-import {CUtils} from './td-utils.js';
-import {assert} from './td-utils.js';
+import {assert, randomInt, Stack} from './td-utils.js';
 
 const TilesType = Object.freeze(
     {
@@ -20,74 +19,33 @@ const WallsType = Object.freeze(
         "down":0x0001,
         "all":0x1111
     });
-        
-class CMapGenerator 
+
+class CMap
 {
-    constructor()
-    {
+    constructor() {}
 
+    generateMap(mapParams)
+    {
+        initializeMapWithRandomPath();
     }
 
-    generateMap(algorithm, ...args)
+    initializeMapWithRandomPath()
     {
-        switch (algorithm)
-        {
-            case "maze":
-                return generateMapMaze(args);
-            case "simple":
-                return generateMapSimple(args);
-        }
-    }
+        let maze = new CMaze(mapParams.width, mapParams.height);
+        maze.addEntranceAndExitToMaze();
+    
+        this.tilesMap = Array.from(Array(maze.width), () => new Array(maze.height).fill(TilesType.empty));
+        this.width = maze.width;
+        this.height = maze.height;
 
-    generateMapMaze(width, height)
-    {
+        let path = maze.findLongestSolutionPath(false);
+        path.forEach(([x,y]) => {tilesMap[x][y] = TilesType.path});
 
+        this.path = path;
+        this.begin = path[0];
+        this.end = path[path.length - 1]; 
     }
-
-    generateMapSimple(width, height)
-    {
-        console.log("Simple algorithm is not supported yet.");
-        debugger;
-    }
-}
-
-class Stack 
-{
-    constructor()
-    {
-        this.arr = [];
-    }
-
-    push(elem)
-    {
-        this.arr.push(elem);
-    }
-
-    pop()
-    {
-        return this.arr.pop();
-    }
-
-    top()
-    {
-        if (this.arr.length == 0)
-        {
-            throw new Error('Stack is empty!');
-        }
-        
-        return this.arr[this.arr.length - 1];
-    }
-
-    size()
-    {
-        return this.arr.length;
-    }
-
-    isEmpty()
-    {
-        return this.size() == 0;
-    }
-}
+}    
 
 class CMaze
 {
@@ -122,7 +80,7 @@ class CMaze
     {
         let visited = Array.from(Array(this.width), () => new Array(this.height).fill(false));
         let stack = new Stack();
-        let startPosition = [CUtils.randomInt(0, this.width), CUtils.randomInt(0, this.height)];
+        let startPosition = [randomInt(0, this.width), randomInt(0, this.height)];
         
         stack.push(startPosition);
 
@@ -145,7 +103,7 @@ class CMaze
             }
 
             // choose next
-            let selectedNext = nexts[CUtils.randomInt(0, nexts.length)];
+            let selectedNext = nexts[randomInt(0, nexts.length)];
             
             // break the wall
             let [nextX, nextY] = selectedNext.position;
@@ -350,13 +308,13 @@ class CMaze
     selectRandomEntrance()
     {
         const possible = this.findPossibleEntrancePixels();
-        return possible[CUtils.randomInt(0, possible.length)];
+        return possible[randomInt(0, possible.length)];
     }
 
     selectRandomExit()
     {
         const possible = this.findPossibleExitPixels();
-        return possible[CUtils.randomInt(0, possible.length)];
+        return possible[randomInt(0, possible.length)];
     }
 
     findPossibleEntrancePixels()
@@ -492,7 +450,7 @@ class CMaze
             neighbours = neighbours.filter((next) => {return this.mazePixels[next[0]][next[1]] == TilesType.path}); 
             assert(neighbours.length > 0);
 
-            let next = neighbours[CUtils.randomInt(0, neighbours.length)];
+            let next = neighbours[randomInt(0, neighbours.length)];
             
             this.mazePixels[next[0]][next[1]] = TilesType.solution;
             solution.push(next);
@@ -556,8 +514,8 @@ class CMaze
     {
         for (let i = 0; i < 100; i++)
         {
-            const width = CUtils.randomInt(2, 500);
-            const height = CUtils.randomInt(2, 500);
+            const width = randomInt(2, 500);
+            const height = randomInt(2, 500);
             let maze = new CMaze(width, height);
             maze.addEntranceAndExitToMaze();
             const pathLength = maze.calculatePathPixelsCount();
@@ -576,8 +534,8 @@ class CMaze
     {
         for (let i = 0; i < 100; i++)
         {
-            const width = CUtils.randomInt(2, 500);
-            const height = CUtils.randomInt(2, 500);
+            const width = randomInt(2, 500);
+            const height = randomInt(2, 500);
             let maze = new CMaze(width, height);
             maze.addEntranceAndExitToMaze();
             maze.findSolutionPath();
@@ -600,8 +558,8 @@ class CMaze
     {
         for (let i = 0; i < 10000; i++)
         {
-            const width = CUtils.randomInt(2, 500);
-            const height = CUtils.randomInt(2, 500);
+            const width = randomInt(2, 500);
+            const height = randomInt(2, 500);
             new CMaze(width, height);
 
             if (i % 100 == 0)

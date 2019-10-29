@@ -1,11 +1,53 @@
-export class CUtils
+// 
+// returns random integer in [min, max) interval
+//
+export function randomInt(min, max)
 {
-    // 
-    // returns random integer in [min, max) interval
-    //
-    static randomInt(min, max)
+    return min + Math.floor(Math.random() * (max - min));
+}
+
+export function assert(expression)
+{
+    if (!expression) {
+        debugger;
+    }
+}
+
+export class Stack 
+{
+    constructor()
     {
-        return min + Math.floor(Math.random() * (max - min));
+        this.arr = [];
+    }
+
+    push(elem)
+    {
+        this.arr.push(elem);
+    }
+
+    pop()
+    {
+        return this.arr.pop();
+    }
+
+    top()
+    {
+        if (this.arr.length == 0)
+        {
+            throw new Error('Stack is empty!');
+        }
+        
+        return this.arr[this.arr.length - 1];
+    }
+
+    size()
+    {
+        return this.arr.length;
+    }
+
+    isEmpty()
+    {
+        return this.size() == 0;
     }
 }
 
@@ -18,7 +60,7 @@ export class CUtilsTest
             const min = Math.random() * 1000;
             const max = Math.random() * 1000 + min;
             
-            const result = CUtils.randomInt(min, max);
+            const result = randomInt(min, max);
             console.assert(min <= result && min < max);
         }    
         console.log("randomIntTest finished successfully!");
@@ -27,12 +69,5 @@ export class CUtilsTest
     static run()
     {
         CUtilsTest.randomIntTest();
-    }
-}
-
-export function assert(expression)
-{
-    if (!expression) {
-        debugger;
     }
 }

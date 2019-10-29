@@ -29,3 +29,10 @@ export class CUtilsTest
         CUtilsTest.randomIntTest();
     }
 }
+
+export function assert(expression)
+{
+    if (!expression) {
+        debugger;
+    }
+}

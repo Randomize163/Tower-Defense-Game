@@ -1,4 +1,5 @@
 import {CUtils} from './td-utils.js';
+import {assert} from './td-utils.js';
 
 const TilesType = Object.freeze(
     {
@@ -6,7 +7,9 @@ const TilesType = Object.freeze(
         "path":0, 
         "build":2,
         "spawn":3,
-        "base":4
+        "base":4,
+        "solution":5,
+        "removedPath":6
     });
 
 const WallsType = Object.freeze(
@@ -207,6 +210,9 @@ class CMaze
                 this.transformTileToPixels(i, j, addInternalWall);
             }
         }
+
+        this.width = this.mazePixels.length;
+        this.height = this.mazePixels[0].length;
     }
 
     transformTileToPixels(i, j, addInternalWall = false)
@@ -287,10 +293,10 @@ class CMaze
                 switch (mazePixels[i][j])
                 {
                     case TilesType.empty:
-                        maze += "▇";
+                        maze += "#";
                         break;
                     case TilesType.path:
-                        maze += "　";
+                        maze += " ";
                         break;
                     case TilesType.base:
                         maze += "B";
@@ -298,6 +304,12 @@ class CMaze
                     case TilesType.spawn:
                         maze += "S";
                         break;        
+                    case TilesType.solution:
+                        maze += "+"; 
+                        break;    
+                    case TilesType.removedPath:
+                        maze += "x";
+                        break;
                     default:
                         console.error("Unprintable tile type: " + mazePixels[i][j]);
                         debugger;
@@ -322,6 +334,262 @@ class CMaze
         outputElement.innerHTML = CMaze.mazePixelsToString(this.mazePixels);
     }
 
+    addEntranceAndExitToMaze()
+    {
+        this.entrance = this.selectRandomEntrance();
+        
+        const [entranceX, entranceY] = this.entrance;
+        this.mazePixels[entranceX][entranceY] = TilesType.spawn;
+
+        this.exit = this.selectRandomExit();
+
+        const [exitX, exitY] = this.exit;
+        this.mazePixels[exitX][exitY] = TilesType.base;
+    }
+
+    selectRandomEntrance()
+    {
+        const possible = this.findPossibleEntrancePixels();
+        return possible[CUtils.randomInt(0, possible.length)];
+    }
+
+    selectRandomExit()
+    {
+        const possible = this.findPossibleExitPixels();
+        return possible[CUtils.randomInt(0, possible.length)];
+    }
+
+    findPossibleEntrancePixels()
+    {
+        let result = [];
+        for (let j = 0; j < this.mazePixels[0].length; j++)
+        {
+            if (this.pixelCouldBeEntrance(0, j))
+            {
+                result.push([0, j]);
+            }
+        }
+
+        return result;
+    }
+
+    pixelCouldBeEntrance(i, j)
+    {
+        console.assert(i == 0);
+        return this.mazePixels[i + 1][j] == TilesType.path;
+    }
+
+    findPossibleExitPixels()
+    {
+        let result = [];
+
+        const lastColomn = this.mazePixels.length - 1;
+        for (let j = 0; j < this.mazePixels[0].length; j++)
+        {
+            if (this.pixelCouldBeExit(lastColomn, j))
+            {
+                result.push([lastColomn, j]);
+            }
+        }
+
+        return result;
+    }
+
+    pixelCouldBeExit(i, j)
+    {
+        console.assert(i == this.mazePixels.length - 1);
+        return this.mazePixels[i - 1][j] == TilesType.path;
+    }
+
+    countPathPixels()
+    {
+        let path = 0;
+        this.mazePixels.forEach((pixel) => {
+            if (pixel == TilesType.path)
+            {
+                path++;
+            }
+        });
+
+        return path;
+    }
+
+    findLongestSolutionPath(cleanSolutionPath = true)
+    {
+        let pathPixelsCount = this.calculatePathPixelsCount();
+        let solution = this.findSolutionPath(false);
+
+        const solutionPixelsCount = solution.length - 2;
+        if (solutionPixelsCount * 2 >= pathPixelsCount)
+        {
+            return solution;
+        }
+
+        solution = this.findInvertSolutionPath(cleanSolutionPath);
+        return solution;
+    }
+
+    calculatePathPixelsCount()
+    {
+        let count = 0;
+        for (let i = 0; i < this.mazePixels.length; i++)
+        {
+            for (let j = 0; j < this.mazePixels[0].length; j++)
+            {
+                if (this.mazePixels[i][j] == TilesType.path)
+                {
+                    count++;
+                }
+            }
+        }
+
+        return count;
+    }
+
+    findInvertSolutionPath(cleanSolutionPath = true)
+    {
+        this.removeSolutionPath();
+        return this.findSolutionPath(cleanSolutionPath);
+    }
+
+    removeSolutionPath()
+    {
+        for (let i = 0; i < this.mazePixels.length; i++)
+        {
+            for (let j = 0; j < this.mazePixels[0].length; j++)
+            {
+                if (this.mazePixels[i][j] == TilesType.solution)
+                {
+                    this.mazePixels[i][j] = TilesType.removedPath;
+                }
+            }
+        }
+
+        // change pixels near exit and entrance
+        let [x,y] = this.entrance;
+        this.mazePixels[x + 1][y] = TilesType.path;
+        
+        [x,y] = this.exit;
+        this.mazePixels[x - 1][y] = TilesType.path;
+    }
+
+    findSolutionPath(cleanSolutionPath = true)
+    {
+        let solution = [this.entrance];
+
+        for (;;)
+        {
+            let [currentX, currentY] = solution[solution.length - 1];
+            let neighbours = this.getNeighboursCoordinates(currentX, currentY);
+            
+            // Check if we are near exit
+            const found = neighbours.find(([x, y]) => ((this.exit[0] == x) && (this.exit[1] == y)));
+            if (found)
+            {
+                break;
+            }
+
+            neighbours = neighbours.filter((next) => {return this.mazePixels[next[0]][next[1]] == TilesType.path}); 
+            assert(neighbours.length > 0);
+
+            let next = neighbours[CUtils.randomInt(0, neighbours.length)];
+            
+            this.mazePixels[next[0]][next[1]] = TilesType.solution;
+            solution.push(next);
+        }
+
+        solution.push(this.exit);
+        
+        if (!cleanSolutionPath)
+        {
+            return solution;
+        }
+    
+        solution.forEach(
+            ([x, y], i) => {
+                if (i == 0 || i == (solution.length - 1)) {
+                    return;
+                }
+                
+                this.mazePixels[x][y] == TilesType.path;
+            }
+        );
+    
+        return solution;
+    }
+
+    getNeighboursCoordinates(i, j)
+    {
+        let res = [];
+        if (i > 0)
+        {
+            res.push([i - 1, j]);
+        }
+        if (i < this.mazePixels.length - 1)
+        {
+            res.push([i + 1, j]);
+        }
+        if (j > 0)
+        {
+            res.push([i, j - 1]);
+        }
+        if (j < this.mazePixels[0].length - 1)
+        {
+            res.push([i, j + 1]);
+        }
+        
+        return res;
+    }
+
+    static findLongestSolutionPathShortTest()
+    {
+        let maze = new CMaze(3, 3);
+        maze.addEntranceAndExitToMaze();
+        maze.consoleLogMazePixels();
+        const pathLength = maze.calculatePathPixelsCount();
+        const solution = maze.findLongestSolutionPath(false);
+        maze.consoleLogMazePixels();
+        console.assert((solution.length - 2) * 2 >= pathLength);
+    }
+
+    static findLongestSolutionPathTest()
+    {
+        for (let i = 0; i < 100; i++)
+        {
+            const width = CUtils.randomInt(2, 500);
+            const height = CUtils.randomInt(2, 500);
+            let maze = new CMaze(width, height);
+            maze.addEntranceAndExitToMaze();
+            const pathLength = maze.calculatePathPixelsCount();
+            const solution = maze.findLongestSolutionPath();
+            console.assert((solution.length - 2) * 2 >= pathLength);
+
+            if (i % 10 == 0)
+            {
+                console.log("Finished iteration " + i);
+            }
+        }
+        console.log("Finished findLongestSolutionPath test successfully!");
+    }
+
+    static findSolutionPathTest()
+    {
+        for (let i = 0; i < 100; i++)
+        {
+            const width = CUtils.randomInt(2, 500);
+            const height = CUtils.randomInt(2, 500);
+            let maze = new CMaze(width, height);
+            maze.addEntranceAndExitToMaze();
+            maze.findSolutionPath();
+
+            if (i % 10 == 0)
+            {
+                console.log("Finished iteration " + i);
+            }
+        }
+        console.log("Finished findSolutionPath test successfully!");
+    }
+
     static simpleTest()
     {
         new CMaze(3,3).consoleLogMazePixels();
@@ -343,12 +611,23 @@ class CMaze
         }
         console.log("Finished long test successfully!");
     }
+
+    static addEntranceAndExitToMazeTest()
+    {
+        let maze = new CMaze(10, 10);
+        maze.addEntranceAndExitToMaze();
+        maze.consoleLogMazePixels();
+    }
 } 
 
 export class CMapTest {
     static run()
     {
         CMaze.simpleTest();
+        CMaze.addEntranceAndExitToMazeTest();
+        CMaze.findSolutionPathTest();
+        CMaze.findLongestSolutionPathShortTest();
+        CMaze.findLongestSolutionPathTest();
         CMaze.longTest();
     }
 }

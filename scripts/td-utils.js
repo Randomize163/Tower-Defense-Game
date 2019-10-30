@@ -6,6 +6,20 @@ export function randomInt(min, max)
     return min + Math.floor(Math.random() * (max - min));
 }
 
+export function randomBoolWithProbability(trueProbability)
+{
+    assert(0 <= trueProbability <= 1);
+    if (trueProbability == 0) {
+        return false;
+    }
+
+    if (trueProbability == 1) {
+        return true;
+    }
+
+    return Math.random() <= trueProbability;
+}
+
 export function assert(expression)
 {
     if (!expression) {

@@ -1,14 +1,15 @@
-import {assert, randomInt, Stack} from './td-utils.js';
+import {assert, randomInt, Stack, randomBoolWithProbability} from './td-utils.js';
+import {AssetType, IAssetCollection, CKenneyAssetsCollection} from './td-asset.js';
 
 const TilesType = Object.freeze(
     {
-        "empty":1, 
-        "path":0, 
-        "build":2,
-        "spawn":3,
-        "base":4,
+        "empty":AssetType.emptyTile, 
+        "path":AssetType.roadTile, 
+        "build":AssetType.towerTile,
+        "spawn":AssetType.begin,
+        "base":AssetType.end,
         "solution":5,
-        "removedPath":6
+        "removedPath":6,
     });
 
 const WallsType = Object.freeze(
@@ -18,20 +19,55 @@ const WallsType = Object.freeze(
         "up":0x0010,
         "down":0x0001,
         "all":0x1111
-    });
+    });  
 
 class CMap
 {
-    constructor() {}
-
-    generateMap(mapParams)
+    constructor(width, height) 
     {
-        initializeMapWithRandomPath();
+        this.width = width;
+        this.height = height;
+    }
+
+    generateMap(mapParams = {'fillFactor':0.70})
+    {
+        this.initializeMapWithRandomPath();
+        this.addRandomTowerTiles(mapParams.fillFactor);
+    }
+
+    addRandomTowerTiles(fillFactor)
+    {
+        for (let i = 0; i < this.tilesMap.length; i++)
+        {
+            for (let j = 0; j < this.tilesMap[0].length; j++)
+            {
+                if (this.tilesMap[i][j] != TilesType.empty) {
+                    continue;
+                }
+
+                const neighbours = CMaze.getNeighboursCoordinates(i, j, this.tilesMap.length, this.tilesMap[0].length);
+                const isCloseToPath = neighbours.some(
+                    ([x, y]) =>
+                    {
+                        return this.tilesMap[x][y] == TilesType.path;
+                    }
+                );
+
+                if (!isCloseToPath) {
+                   continue;
+                }
+                    
+                if (randomBoolWithProbability(fillFactor))
+                {
+                    this.tilesMap[i][j] = TilesType.build;
+                }
+            }
+        }
     }
 
     initializeMapWithRandomPath()
     {
-        let maze = new CMaze(mapParams.width, mapParams.height);
+        let maze = new CMaze(this.width, this.height);
         maze.addEntranceAndExitToMaze();
     
         this.tilesMap = Array.from(Array(maze.width), () => new Array(maze.height).fill(TilesType.empty));
@@ -39,13 +75,63 @@ class CMap
         this.height = maze.height;
 
         let path = maze.findLongestSolutionPath(false);
-        path.forEach(([x,y]) => {tilesMap[x][y] = TilesType.path});
+        path.forEach(([x,y]) => {this.tilesMap[x][y] = TilesType.path});
 
         this.path = path;
         this.begin = path[0];
         this.end = path[path.length - 1]; 
     }
+
+    //
+    // draw() - ctx is a canvas.getContext('2d'); tiles is an instance of IAssetCollection
+    //
+    draw(ctx, tiles)
+    {
+        let dTileSize = 64;
+        let [dx, dy] = [0, 0];
+
+        for (let i = 0; i < this.tilesMap.length; i++)
+        {
+            for (let j = 0; j < this.tilesMap[0].length; j++)
+            {
+                const asset = tiles.getAsset(this.tilesMap[i][j]);
+                ctx.drawImage(asset.image, asset.sx, asset.sy, asset.sWidth, asset.sHeight, dx, dy, dTileSize, dTileSize);
+                dx += dTileSize;
+            }
+            dy += dTileSize;
+            dx = 0;
+        }
+    }
+
+    static generateMapTest()
+    {
+        let map = new CMap(3,3);
+        map.generateMap({});
+        console.log(map);
+    }
+
+    static async drawMapTest()
+    {
+        const canvas = document.getElementById('game');
+        const ctx = canvas.getContext('2d');
+
+        let map = new CMap(3,5);
+        map.generateMap();
+
+        let tiles = new CKenneyAssetsCollection();
+        await tiles.initialize();
+        map.draw(ctx, tiles);
+    }
 }    
+
+export class CMapTest 
+{
+    static run()
+    {
+        CMap.generateMapTest();
+        CMap.drawMapTest();
+    }
+}
 
 class CMaze
 {
@@ -251,10 +337,10 @@ class CMaze
                 switch (mazePixels[i][j])
                 {
                     case TilesType.empty:
-                        maze += "#";
+                        maze += "▇";//"#";
                         break;
                     case TilesType.path:
-                        maze += " ";
+                        maze += "　";//" ";
                         break;
                     case TilesType.base:
                         maze += "B";
@@ -438,7 +524,7 @@ class CMaze
         for (;;)
         {
             let [currentX, currentY] = solution[solution.length - 1];
-            let neighbours = this.getNeighboursCoordinates(currentX, currentY);
+            let neighbours = CMaze.getNeighboursCoordinates(currentX, currentY, this.mazePixels.length, this.mazePixels[0].length);
             
             // Check if we are near exit
             const found = neighbours.find(([x, y]) => ((this.exit[0] == x) && (this.exit[1] == y)));
@@ -476,14 +562,14 @@ class CMaze
         return solution;
     }
 
-    getNeighboursCoordinates(i, j)
+    static getNeighboursCoordinates(i, j, imax, jmax)
     {
         let res = [];
         if (i > 0)
         {
             res.push([i - 1, j]);
         }
-        if (i < this.mazePixels.length - 1)
+        if (i < imax - 1)
         {
             res.push([i + 1, j]);
         }
@@ -491,7 +577,7 @@ class CMaze
         {
             res.push([i, j - 1]);
         }
-        if (j < this.mazePixels[0].length - 1)
+        if (j < jmax - 1)
         {
             res.push([i, j + 1]);
         }
@@ -578,7 +664,7 @@ class CMaze
     }
 } 
 
-export class CMapTest {
+export class CMazeTest {
     static run()
     {
         CMaze.simpleTest();

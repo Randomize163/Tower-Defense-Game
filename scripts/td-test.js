@@ -1,15 +1,18 @@
-import {CMapTest, CMazeTest} from './td-map.js';
+import {CMazeTest} from './td-maze.js';
 import {CUtilsTest} from './td-utils.js';
+import {CFloorLayerTest} from './td-layer-floor.js';
+import {CDecorationsLayerTest} from './td-layer-decorations.js';
 
 const TEST_CONFIG_ADD_TIMEOUT = false;
 
 class CTest 
-{
-    static run()
+{ 
+    static async run()
     {
-        //CMazeTest.run();
-        CMapTest.run(); 
+        await CFloorLayerTest.run();
+        await CDecorationsLayerTest.run();
         CUtilsTest.run();
+        CMazeTest.run();
     }
 }
 

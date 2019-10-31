@@ -6,6 +6,10 @@ export function randomInt(min, max)
     return min + Math.floor(Math.random() * (max - min));
 }
 
+
+//
+// returns random bool with probability
+//
 export function randomBoolWithProbability(trueProbability)
 {
     assert(0 <= trueProbability <= 1);
@@ -46,11 +50,38 @@ export function randomChoice(options)
     return null;
 }
 
+export function getNeighboursCoordinates(i, j, imax, jmax)
+{
+    let res = [];
+    if (i > 0)
+    {
+        res.push([i - 1, j]);
+    }
+    if (i < imax - 1)
+    {
+        res.push([i + 1, j]);
+    }
+    if (j > 0)
+    {
+        res.push([i, j - 1]);
+    }
+    if (j < jmax - 1)
+    {
+        res.push([i, j + 1]);
+    }
+    
+    return res;
+}
+
 export function assert(expression)
 {
     if (!expression) {
         debugger;
     }
+}
+
+export function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 export class Stack 

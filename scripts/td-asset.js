@@ -8,6 +8,12 @@ export const AssetType = Object.freeze(
         "beginTile":2,
         "endTile":3,
         "towerTile":4,
+        "stone1Tile":5,
+        "stone2Tile":6,
+        "stone3Tile":7,
+        "bush1Tile":8,
+        "bush2Tile":9,
+        "bush3Tile":10,
     });
 
 export class IAssetCollection
@@ -71,7 +77,6 @@ export class CKenneyAssetsCollection extends IAssetCollection
                 asset.sx = this.sTileWidth * 22;
                 asset.sy = this.sTileHeight * 6;
                 break;
-
             case AssetType.roadTile:
             case AssetType.endTile:
             case AssetType.beginTile:
@@ -82,6 +87,30 @@ export class CKenneyAssetsCollection extends IAssetCollection
                 asset.sx = this.sTileWidth * 20;
                 asset.sy = this.sTileHeight * 4;
                 break;  
+            case AssetType.stone1Tile:
+                asset.sx = this.sTileWidth * 20;
+                asset.sy = this.sTileHeight * 5;
+                break;   
+            case AssetType.stone2Tile:
+                asset.sx = this.sTileWidth * 21;
+                asset.sy = this.sTileHeight * 5;
+                break;
+            case AssetType.stone3Tile:
+                asset.sx = this.sTileWidth * 22;
+                asset.sy = this.sTileHeight * 5;
+                break;
+            case AssetType.bush1Tile:
+                asset.sx = this.sTileWidth * 15;
+                asset.sy = this.sTileHeight * 5;
+                break;
+            case AssetType.bush2Tile:
+                asset.sx = this.sTileWidth * 18;
+                asset.sy = this.sTileHeight * 5;
+                break;
+            case AssetType.bush3Tile:
+                asset.sx = this.sTileWidth * 19;
+                asset.sy = this.sTileHeight * 5;
+                break;
             default:
                 console.error("Unknown asset type");
                 debugger;

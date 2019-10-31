@@ -1,4 +1,4 @@
-import {assert, randomInt, Stack, randomBoolWithProbability} from './td-utils.js';
+import {assert, randomInt, Stack, randomBoolWithProbability, randomChoice} from './td-utils.js';
 import {AssetType, IAssetCollection, CKenneyAssetsCollection} from './td-asset.js';
 
 const TilesType = Object.freeze(
@@ -33,6 +33,7 @@ class CMap
     {
         this.initializeMapWithRandomPath();
         this.addRandomTowerTiles(mapParams.fillFactor);
+        this.addRandomDecorations(CMap.decorationsFillFactorDefault());
     }
 
     addRandomTowerTiles(fillFactor)
@@ -82,6 +83,76 @@ class CMap
         this.end = path[path.length - 1]; 
     }
 
+    static decorationsFillFactorDefault() 
+    {
+        return [
+            /*{   
+                'value':AssetType.stone1Tile, 
+                'prob':0.05,
+            },
+            {   
+                'value':AssetType.stone2Tile, 
+                'prob':0.05,
+            },
+            {   
+                'value':AssetType.stone3Tile, 
+                'prob':0.05,
+            },
+            {   
+                'value':AssetType.bush1Tile, 
+                'prob':0.05,
+            },
+            {   
+                'value':AssetType.bush2Tile, 
+                'prob':0.05,
+            },
+            {   
+                'value':AssetType.bush3Tile, 
+                'prob':0.05,
+            },
+            {   
+                'value':AssetType.emptyTile, 
+                'prob':0.7,
+            },*/
+            {   
+                'value':AssetType.stone2Tile, 
+                'prob':0.1,
+            },
+            {   
+                'value':AssetType.bush1Tile, 
+                'prob':0.2,
+            },
+            {   
+                'value':AssetType.bush3Tile, 
+                'prob':0.1,
+            },
+            {   
+                'value':AssetType.emptyTile, 
+                'prob':0.6,
+            },
+        ];
+    }
+
+    addRandomDecorations(fillFactors)
+    {
+        //assert(fillFactor.stones + fillFactor.stones + fillFactor.empty == 1);
+        this.decorationsMap = Array.from(Array(this.width), () => new Array(this.height).fill(TilesType.empty));
+
+        for (let i = 0; i < this.tilesMap.length; i++)
+        {
+            for (let j = 0; j < this.tilesMap[0].length; j++)
+            {
+                if (this.tilesMap[i][j] != TilesType.empty)
+                {
+                    continue;
+                }
+
+                const decoration = randomChoice(fillFactors);  
+                this.decorationsMap[i][j] = decoration;
+            }
+        }
+    }
+
     //
     // draw() - ctx is a canvas.getContext('2d'); tiles is an instance of IAssetCollection
     //
@@ -96,6 +167,14 @@ class CMap
             {
                 const asset = tiles.getAsset(this.tilesMap[i][j]);
                 ctx.drawImage(asset.image, asset.sx, asset.sy, asset.sWidth, asset.sHeight, dx, dy, dTileSize, dTileSize);
+
+
+                if (this.decorationsMap[i][j] != AssetType.emptyTile)
+                {
+                    const decor = tiles.getAsset(this.decorationsMap[i][j]);
+                    ctx.drawImage(decor.image, decor.sx, decor.sy, decor.sWidth, decor.sHeight, dx, dy, dTileSize, dTileSize);
+                }
+
                 dx += dTileSize;
             }
             dy += dTileSize;

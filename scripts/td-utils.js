@@ -20,6 +20,32 @@ export function randomBoolWithProbability(trueProbability)
     return Math.random() <= trueProbability;
 }
 
+//
+// randomChoice() - returns one of options values according to their probabilities
+// options = [{'value':0, 'prob':0.2}]
+// sum of probabilities must be equal to 1
+//
+export function randomChoice(options)
+{
+    assert(options.map(option => option.prob).reduce((acc, curr) => acc + curr) == 1);
+    const rand = Math.random();
+
+    let [intervalL, intervalR] = [0, 0];
+    for (let i = 0; i < options.length; i++)
+    {
+        intervalL = intervalR;
+        intervalR += options[i].prob;
+
+        if (intervalL <= rand && rand < intervalR)
+        {
+            return options[i].value;
+        }
+    }
+
+    assert(false);
+    return null;
+}
+
 export function assert(expression)
 {
     if (!expression) {

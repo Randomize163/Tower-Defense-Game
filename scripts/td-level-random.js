@@ -17,10 +17,20 @@ export class CRandomLevel extends ILevel
 
         let decorations = new CDecorationsLayer(this.width, this.height);
         decorations.generateRandomDecorations(floor);
+        decorations.addBeginAndEndDecorations(floor);
         
         this.layers.push(floor);
         this.layers.push(decorations);
     }
+
+    getPath()
+    {
+        return this.layers[0].path;
+    }
+
+    //
+    // Tests
+    //
 
     static simpleTest()
     {
@@ -41,7 +51,7 @@ export class CRandomLevel extends ILevel
         level.draw(ctx, tiles);
         await sleep(1000);
 
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        //ctx.clearRect(0, 0, canvas.width, canvas.height);
     }
 }
 

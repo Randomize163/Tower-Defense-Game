@@ -46,6 +46,15 @@ export class CDecorationsLayer extends ILayer
         }
     }
 
+    addBeginAndEndDecorations(floorLayer)
+    {
+        let [x,y] = floorLayer.begin;
+        this.tilesMap[x][y] = AssetType.beginTile;
+        
+        [x,y] = floorLayer.end;
+        this.tilesMap[x][y] = AssetType.endTile;
+    }
+
     static async generateDecorationsLayerTest()
     {
         let emptyLayer = new ILayer(5,5);

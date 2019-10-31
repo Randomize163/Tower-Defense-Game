@@ -14,8 +14,8 @@ class CTest
         await CDecorationsLayerTest.run();
         await CRandomLevelTest.run();
         
-        CUtilsTest.run();
-        CMazeTest.run();
+        //CUtilsTest.run();
+        //CMazeTest.run();
     }
 }
 

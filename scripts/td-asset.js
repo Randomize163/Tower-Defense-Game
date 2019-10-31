@@ -74,13 +74,23 @@ export class CKenneyAssetsCollection extends IAssetCollection
 
         switch (type)
         {
+            case AssetType.endTile: 
+                asset.sx = 0;
+                asset.sy = 170;
+                asset.sWidth = 180;
+                asset.sHeight = 220;
+                break;
+            case AssetType.beginTile:
+                asset.sx = 0;
+                asset.sy = 0;
+                asset.sWidth = 180;
+                asset.sHeight = 170;
+                break;
             case AssetType.emptyTile:
                 asset.sx = this.sTileWidth * 22;
                 asset.sy = this.sTileHeight * 6;
                 break;
             case AssetType.roadTile:
-            case AssetType.endTile:
-            case AssetType.beginTile:
                 asset.sx = this.sTileWidth * 21;
                 asset.sy = this.sTileHeight * 6;
                 break;    

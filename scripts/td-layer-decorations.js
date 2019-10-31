@@ -22,7 +22,7 @@ const decorationsFillFactorDefault =
     },
 ];
 
-class CDecorationsLayer extends ILayer
+export class CDecorationsLayer extends ILayer
 {
     constructor(width, height)
     {

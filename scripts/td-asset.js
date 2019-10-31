@@ -14,6 +14,7 @@ export const AssetType = Object.freeze(
         "bush1Tile":8,
         "bush2Tile":9,
         "bush3Tile":10,
+        "transparentTile":11,
     });
 
 export class IAssetCollection

@@ -3,7 +3,7 @@ import {CMaze} from './td-maze.js';
 import { AssetType, CKenneyAssetsCollection } from './td-asset.js';
 import { getNeighboursCoordinates, randomBoolWithProbability, sleep } from './td-utils.js';
 
-class CFloorLayer extends ILayer
+export class CFloorLayer extends ILayer
 {
     constructor(width, height, params = {'towerTilesFillFactor':0.6})
     {

@@ -7,7 +7,7 @@ export class ILayer
         this.width = width;
         this.height = height;
 
-        this.tilesMap = Array.from(Array(width), () => new Array(height).fill(AssetType.emptyTile));
+        this.tilesMap = Array.from(Array(width), () => new Array(height).fill(AssetType.transparentTile));
     }
 
     //
@@ -21,8 +21,11 @@ export class ILayer
             let dx = fromdx;
             for (let j = fromj; j < maxj; j++)
             {
-                const asset = tiles.getAsset(this.tilesMap[i][j]);
-                ctx.drawImage(asset.image, asset.sx, asset.sy, asset.sWidth, asset.sHeight, dx, dy, dTileSize, dTileSize);  
+                if (this.tilesMap[i][j] != AssetType.transparentTile)
+                {
+                    const asset = tiles.getAsset(this.tilesMap[i][j]);
+                    ctx.drawImage(asset.image, asset.sx, asset.sy, asset.sWidth, asset.sHeight, dx, dy, dTileSize, dTileSize);  
+                }
                 dx += dTileSize;
             }
             dy += dTileSize;

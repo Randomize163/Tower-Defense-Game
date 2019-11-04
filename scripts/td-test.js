@@ -1,5 +1,5 @@
 import {CMazeTest} from './td-maze.js';
-import {CUtilsTest} from './td-utils.js';
+import {CUtilsTest, sleep} from './td-utils.js';
 import {CFloorLayerTest} from './td-layer-floor.js';
 import {CDecorationsLayerTest} from './td-layer-decorations.js';
 import { CRandomLevelTest, CRandomLevel } from './td-level-random.js';
@@ -17,7 +17,7 @@ class CTest
         //await CFloorLayerTest.run();
         //await CDecorationsLayerTest.run();
         //await CRandomLevelTest.run();
-        await CTest.towerTest();
+        //await CTest.towerTest();
         await CTest.enemyTest();
         //CUtilsTest.run();
         //CMazeTest.run();
@@ -48,14 +48,35 @@ class CTest
         const canvas = document.getElementById('game');
         const ctx = canvas.getContext('2d');
 
-        let level = new CRandomLevel(3,3);
+        let level = new CRandomLevel(5,3);
 
-        const camera = new Camera(ctx.canvas.clientWidth, ctx.canvas.clientHeight);
+        const camera = new Camera(ctx.canvas.clientWidth, ctx.canvas.clientHeight, 64);
         
-        const enemy = new CEnemy(level.getBegin()[0] + 0.5, level.getBegin()[1] + 0.5 , 90, 0.05, 100, 100, 0.1, AssetType.enemyBasic);
-        level.display(ctx, tiles, camera);
-        enemy.setPath(level.getPath());
-        enemy.display(ctx, tiles, camera); 
+        const enemies = [];
+        const runningEnemies = [];
+        for (let i = 0; i < 1000; i++)
+        {
+            const enemy = new CEnemy(level.getBegin()[0] + Math.random(), level.getBegin()[1] + Math.random() , 0, 0.0025, 100, 100, 0.1, AssetType.enemyTankGreen);
+            enemy.setPath(level.getPath());
+
+            enemies.push(enemy);
+        }
+
+        setInterval(() => {
+                ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+                level.display(ctx, tiles, camera);
+                runningEnemies.forEach((enemy) => {
+                    enemy.calculate(15);
+                    enemy.display(ctx, tiles, camera);
+                });
+            },
+            15);
+        
+        for (let i = 0; i < enemies.length; i++)
+        {
+            runningEnemies.push(enemies[i]); 
+            await sleep(500);
+        }   
     }
 }
 

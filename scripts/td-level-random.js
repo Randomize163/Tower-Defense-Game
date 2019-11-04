@@ -29,6 +29,11 @@ export class CRandomLevel extends ILevel
         return this.layers[0].path;
     }
 
+    getBegin()
+    {
+        return this.layers[0].begin;
+    }
+
     //
     // Tests
     //

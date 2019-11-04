@@ -15,6 +15,8 @@ export const AssetType = Object.freeze(
         "bush2Tile":9,
         "bush3Tile":10,
         "transparentTile":11,
+        "rocketTowerBase":21,
+        "rocketTowerHead":22,
     });
 
 export class IAssetCollection
@@ -74,17 +76,21 @@ export class CKenneyAssetsCollection extends IAssetCollection
 
         switch (type)
         {
+            case AssetType.rocketTowerBase:
+                asset.sx = this.sTileWidth * 20;
+                asset.sy = this.sTileHeight * 7;
+                break;
+            case AssetType.rocketTowerHead:
+                asset.sx = this.sTileWidth * 20;
+                asset.sy = this.sTileHeight * 8;
+                break;
             case AssetType.endTile: 
                 asset.sx = 0;
-                asset.sy = 170;
-                asset.sWidth = 180;
-                asset.sHeight = 220;
+                asset.sy = 0;
                 break;
             case AssetType.beginTile:
                 asset.sx = 0;
-                asset.sy = 0;
-                asset.sWidth = 180;
-                asset.sHeight = 170;
+                asset.sy = 128;
                 break;
             case AssetType.emptyTile:
                 asset.sx = this.sTileWidth * 22;

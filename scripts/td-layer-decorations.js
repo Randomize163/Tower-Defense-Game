@@ -1,6 +1,7 @@
 import {ILayer} from './td-layer.js';
 import {randomChoice, sleep} from './td-utils.js';
 import {AssetType, CKenneyAssetsCollection} from './td-asset.js';
+import { Camera } from './td-camera.js';
 
 const decorationsFillFactorDefault = 
 [
@@ -66,7 +67,9 @@ export class CDecorationsLayer extends ILayer
 
         const canvas = document.getElementById('game');
         const ctx = canvas.getContext('2d');
-        decoration.draw(ctx, tiles);
+
+        const camera = new Camera(ctx.canvas.clientWidth, ctx.canvas.clientHeight);
+        decoration.display(ctx, tiles, camera);
         await sleep(1000);
         ctx.clearRect(0, 0, canvas.width, canvas.height);
     }

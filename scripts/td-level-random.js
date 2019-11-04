@@ -4,6 +4,7 @@ import { CDecorationsLayer } from "./td-layer-decorations.js";
 import { CKenneyAssetsCollection } from "./td-asset.js";
 import { ILevel } from "./td-level.js";
 import { sleep } from "./td-utils.js";
+import { Camera } from "./td-camera.js";
 
 export class CRandomLevel extends ILevel
 {
@@ -48,7 +49,8 @@ export class CRandomLevel extends ILevel
 
         let level = new CRandomLevel(3,3);
 
-        level.draw(ctx, tiles);
+        const camera = new Camera(ctx.canvas.clientWidth, ctx.canvas.clientHeight);
+        level.display(ctx, tiles, camera);
         await sleep(1000);
 
         //ctx.clearRect(0, 0, canvas.width, canvas.height);

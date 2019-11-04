@@ -2,6 +2,7 @@ import {ILayer} from './td-layer.js';
 import {CMaze} from './td-maze.js';
 import { AssetType, CKenneyAssetsCollection } from './td-asset.js';
 import { getNeighboursCoordinates, randomBoolWithProbability, sleep } from './td-utils.js';
+import { Camera } from './td-camera.js';
 
 export class CFloorLayer extends ILayer
 {
@@ -73,7 +74,8 @@ export class CFloorLayer extends ILayer
         let tiles = new CKenneyAssetsCollection();
         await tiles.initialize();
 
-        layer.draw(ctx, tiles);
+        const camera = new Camera(ctx.canvas.clientWidth, ctx.canvas.clientHeight);
+        layer.display(ctx, tiles, camera);
         await sleep(1000);
         ctx.clearRect(0, 0, canvas.width, canvas.height);
     }

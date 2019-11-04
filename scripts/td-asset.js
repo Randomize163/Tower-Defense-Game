@@ -17,6 +17,7 @@ export const AssetType = Object.freeze(
         "transparentTile":11,
         "rocketTowerBase":21,
         "rocketTowerHead":22,
+        "enemyBasic":30,
     });
 
 export class IAssetCollection
@@ -76,6 +77,10 @@ export class CKenneyAssetsCollection extends IAssetCollection
 
         switch (type)
         {
+            case AssetType.enemyBasic:
+                asset.sx = this.sTileWidth * 15;
+                asset.sy = this.sTileHeight * 10;
+                break;
             case AssetType.rocketTowerBase:
                 asset.sx = this.sTileWidth * 20;
                 asset.sy = this.sTileHeight * 7;

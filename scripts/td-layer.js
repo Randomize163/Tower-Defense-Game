@@ -21,10 +21,10 @@ export class ILayer extends IDisplayable
         const lastTileIndexX = Math.min(camera.lastTileIndexX, this.width - 1);
         const lastTileIndexY = Math.min(camera.lastTileIndexY, this.height - 1);
 
-        let dy = camera.firstTileIndexY * camera.tileSize;
+        let dx = camera.firstTileIndexX * camera.tileSize;
         for (let i = camera.firstTileIndexX; i <= lastTileIndexX; i++)
         {
-            let dx = camera.firstTileIndexX * camera.tileSize;
+            let dy = camera.firstTileIndexY * camera.tileSize;
             for (let j = camera.firstTileIndexY; j <= lastTileIndexY; j++)
             {
                 if (this.tilesMap[i][j] != AssetType.transparentTile)
@@ -32,9 +32,9 @@ export class ILayer extends IDisplayable
                     const asset = assets.getAsset(this.tilesMap[i][j]);
                     ctx.drawImage(asset.image, asset.sx, asset.sy, asset.sWidth, asset.sHeight, dx, dy, camera.tileSize, camera.tileSize);  
                 }
-                dx += camera.tileSize;
+                dy += camera.tileSize;
             }
-            dy += camera.tileSize;
+            dx += camera.tileSize;
         }
     }
 }

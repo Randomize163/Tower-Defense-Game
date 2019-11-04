@@ -51,10 +51,11 @@ class CTest
         let level = new CRandomLevel(3,3);
 
         const camera = new Camera(ctx.canvas.clientWidth, ctx.canvas.clientHeight);
+        
+        const enemy = new CEnemy(level.getBegin()[0] + 0.5, level.getBegin()[1] + 0.5 , 90, 0.05, 100, 100, 0.1, AssetType.enemyBasic);
         level.display(ctx, tiles, camera);
-
-        const enemy = new CEnemy(2.5, 2.5, 90, 0.05, 100, 100, 0.1, AssetType.enemyBasic);
-        enemy.display(ctx, tiles, camera);
+        enemy.setPath(level.getPath());
+        enemy.display(ctx, tiles, camera); 
     }
 }
 

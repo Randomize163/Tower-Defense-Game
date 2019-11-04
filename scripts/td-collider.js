@@ -1,3 +1,5 @@
+import { distance } from "./td-utils.js";
+
 export class ICollider
 {
     //
@@ -16,12 +18,7 @@ export class CircleCollider
 
     collide(collider)
     {
-        const dist = CircleCollider.distance(this.gameObject.x, this.gameObject.y, collider.gameObject.x, collider.gameObject.y);
+        const dist = distance(this.gameObject.x, this.gameObject.y, collider.gameObject.x, collider.gameObject.y);
         return dist < (this.radius + collider.radius);
-    }
-
-    static distance(x1, y1, x2, y2)
-    {
-        return Math.sqrt((x1 - x2)**2 + (y1 - y2)**2);
     }
 } 

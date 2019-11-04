@@ -6,7 +6,6 @@ export function randomInt(min, max)
     return min + Math.floor(Math.random() * (max - min));
 }
 
-
 //
 // returns random bool with probability
 //
@@ -82,6 +81,11 @@ export function assert(expression)
 
 export function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+export function distance(x1, y1, x2, y2)
+{
+    return Math.sqrt((x1 - x2)**2 + (y1 - y2)**2);
 }
 
 export class Stack 

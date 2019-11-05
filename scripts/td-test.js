@@ -5,7 +5,7 @@ import {CDecorationsLayerTest} from './td-layer-decorations.js';
 import { CRandomLevelTest, CRandomLevel } from './td-level-random.js';
 import { CKenneyAssetsCollection, AssetType } from './td-asset.js';
 import { Camera } from './td-camera.js';
-import { RocketTower } from './td-tower.js';
+import { CRocketTower, CBullet } from './td-tower.js';
 import { CEnemy } from './td-enemy.js';
 
 const TEST_CONFIG_ADD_TIMEOUT = false;
@@ -36,7 +36,7 @@ class CTest
         const camera = new Camera(ctx.canvas.clientWidth, ctx.canvas.clientHeight);
         level.display(ctx, tiles, camera);
         
-        const tower = new RocketTower(1, 1);
+        const tower = new CRocketTower(1, 1);
         tower.display(ctx, tiles, camera);
     }
 
@@ -62,15 +62,16 @@ class CTest
             enemies.push(enemy);
         }
 
+        const timeDelta = 20;
         setInterval(() => {
                 ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
                 level.display(ctx, tiles, camera);
                 runningEnemies.forEach((enemy) => {
-                    enemy.calculate(15);
+                    enemy.calculate(timeDelta);
                     enemy.display(ctx, tiles, camera);
                 });
             },
-            15);
+            timeDelta);
 
         setInterval(() => {
             if (runningEnemies.length == 0) return;

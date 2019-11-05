@@ -20,6 +20,7 @@ export const AssetType = Object.freeze(
         "enemyBasic":30,
         "enemyTankGreen":31,
         "enemyTankWhite":32,
+        "smallRocket":33,
     });
 
 export class IAssetCollection
@@ -79,6 +80,10 @@ export class CKenneyAssetsCollection extends IAssetCollection
 
         switch (type)
         {
+            case AssetType.smallRocket:
+                asset.sx = this.sTileWidth * 21;
+                asset.sy = this.sTileHeight * 10;
+                break;
             case AssetType.enemyTankWhite:
                 asset.sx = this.sTileWidth * 16;
                 asset.sy = this.sTileHeight * 11;

@@ -1,5 +1,5 @@
 import {CMazeTest} from './td-maze.js';
-import {CUtilsTest, sleep} from './td-utils.js';
+import {CUtilsTest, sleep, randomInt} from './td-utils.js';
 import {CFloorLayerTest} from './td-layer-floor.js';
 import {CDecorationsLayerTest} from './td-layer-decorations.js';
 import { CRandomLevelTest, CRandomLevel } from './td-level-random.js';
@@ -48,13 +48,13 @@ class CTest
         const canvas = document.getElementById('game');
         const ctx = canvas.getContext('2d');
 
-        let level = new CRandomLevel(5,3);
+        let level = new CRandomLevel(6,3);
 
         const camera = new Camera(ctx.canvas.clientWidth, ctx.canvas.clientHeight, 64);
         
         const enemies = [];
         const runningEnemies = [];
-        for (let i = 0; i < 1000; i++)
+        for (let i = 0; i < 10; i++)
         {
             const enemy = new CEnemy(level.getBegin()[0] + Math.random(), level.getBegin()[1] + Math.random() , 0, 0.0025, 100, 100, 0.1, AssetType.enemyTankGreen);
             enemy.setPath(level.getPath());
@@ -71,6 +71,12 @@ class CTest
                 });
             },
             15);
+
+        setInterval(() => {
+            if (runningEnemies.length == 0) return;
+            runningEnemies[randomInt(0, runningEnemies.length)].hit(10);
+        },
+        100);
         
         for (let i = 0; i < enemies.length; i++)
         {

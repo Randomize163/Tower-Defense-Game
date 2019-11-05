@@ -7,6 +7,7 @@ export class CEnemy extends IGameObject
     constructor(x, y, rotation, speed, hp, killBonus, radius, assetType)
     {
         super();
+        this.maxHp = hp 
         this.hp = hp;
         this.speed = speed;
         this.killBonus = killBonus;
@@ -16,7 +17,15 @@ export class CEnemy extends IGameObject
         this.rotation = rotation;
         this.assetType = assetType;
 
+        // Pathfinding parameters:
         this.destinationDistanceThreshold = 0.2;
+
+        // Healthbar parameters:
+        this.barShiftYCoef = 0.3;
+        this.barLengthXCoef = 0.5;
+        this.barWidthCoef = 0.08;
+        this.healthBarStrokeWidth = 1;
+        this.healthBarStrokeStyle = 'black';
     }
 
     setPath(path)
@@ -71,7 +80,7 @@ export class CEnemy extends IGameObject
         }
     }
 
-    display(ctx, assets, camera)
+    displayModel(ctx, assets, camera)
     {
         const asset = assets.getAsset(this.assetType);
         ctx.save();
@@ -80,4 +89,71 @@ export class CEnemy extends IGameObject
         ctx.drawImage(asset.image, asset.sx, asset.sy, asset.sWidth, asset.sHeight, -camera.tileSize/2, -camera.tileSize/2, camera.tileSize, camera.tileSize);  
         ctx.restore();
     }
+
+    displayHealh(ctx, assets, camera)
+    {
+        if (!this.gotHit())
+        {
+            //return;
+        }
+
+        const barLengthX = camera.tileSize * this.barLengthXCoef;
+        const barWidthY = camera.tileSize * this.barWidthCoef;
+
+        const barShiftY = -camera.tileSize * this.barShiftYCoef;
+
+        const x = this.tilesX * camera.tileSize - barLengthX/2;
+        const y = this.tilesY * camera.tileSize + barShiftY;
+
+        // display health bar
+        const healthLengthX = this.hp/this.maxHp * barLengthX; 
+        ctx.fillStyle = this.getHealthFillStyle();
+        ctx.fillRect(x, y, healthLengthX, barWidthY);
+
+        // display frame
+        ctx.strokeStyle = this.healthBarStrokeStyle;
+        ctx.lineWidth = this.healthBarStrokeWidth;
+        ctx.strokeRect(x, y, barLengthX, barWidthY);
+
+    }
+
+    getHealthFillStyle()
+    {
+        if (this.hp/this.maxHp < 0.40)
+        {
+            return 'rgba(255, 0, 0, 1)'; // red
+        }
+
+        if (this.hp/this.maxHp < 0.70)
+        {
+            return 'rgba(255, 255, 0, 1)'; // yellow
+        }
+
+        return 'rgba(0, 255, 0, 1)'; // light green
+    }
+
+    gotHit()
+    {
+        return this.hp < this.maxHp;
+    }
+
+    display(ctx, assets, camera)
+    {
+        this.displayModel(ctx, assets, camera);
+        this.displayHealh(ctx, assets, camera);
+    }
+
+    hit(damage)
+    {
+        if (this.hp <= damage)
+        {
+            this.hp = 0;
+            this.die();
+            return;
+        }
+
+        this.hp -= damage;
+    }
+
+    die() {}
 }

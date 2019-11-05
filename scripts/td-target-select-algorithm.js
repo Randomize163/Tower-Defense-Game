@@ -19,7 +19,7 @@ export class CTargetSelectLowestHp extends ITargetSelectAlgorithm
     }
 }
 
-export class CTargetHighestHp extends ITargetSelectAlgorithm
+export class CTargetSelectHighestHp extends ITargetSelectAlgorithm
 {   
     getSortedTargets(enemies, tower)
     {

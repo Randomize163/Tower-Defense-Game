@@ -48,7 +48,7 @@ export class CBullet extends IGameObject
         this.assetType = assetType;
 
         // Parameters:
-        this.destinationDistanceThreshold = 0.1;
+        this.destinationDistanceThreshold = 0.2;
     }
 
     calculate(deltaTime)
@@ -58,7 +58,7 @@ export class CBullet extends IGameObject
             return;
         }
 
-        if (this.timeToLive < 0)
+        if (this.timeToLive < 0 || this.enemy.destroyed)
         {
             this.destroy();
             return;
@@ -76,8 +76,6 @@ export class CBullet extends IGameObject
             this.enemy.hit(this.damage);
             this.destroy();
         }
-
-        
     }
 
     getNextPosition(deltaTime)
@@ -122,13 +120,15 @@ export class CBullet extends IGameObject
 
 export class CRocketTower extends ITower
 {
-    constructor(tileX, tileY, aimAlgo)
+    constructor(tilesX, tilesY, aimAlgo)
     {
         super();
-        this.tileX = tileX;
-        this.tileY = tileY;
+        this.tilesX = tilesX;
+        this.tilesY = tilesY;
+        this.rotate = 0;
 
-        this.aimAlgorithm = new CTargetSelectNoSort();
+        this.aimAlgorithm = aimAlgo;
+        this.rockets = [];
 
         this.upgradeOptions = new Map([
             [
@@ -137,7 +137,7 @@ export class CRocketTower extends ITower
                     "cost": 50,
                     "currentLevel": 0,
                     "maxLevel": 5,
-                    "currentValue": 10,
+                    "currentValue": 15,
                 }
             ],
             [
@@ -164,26 +164,81 @@ export class CRocketTower extends ITower
                     "cost": 50,
                     "currentLevel": 0,
                     "maxLevel": 5,
-                    "currentValue": 5,
+                    "currentValue": 0.025,
                 } 
             ],
         ]);
-    
+        
         this.currentTarget = null;
+        this.reloadTimeLeft = this.reloadTime;
+
+        this.rocketTimeToLive = 5000;
     }
 
-    calculate(enemies) {   
+    get damage()
+    {
+        return this.upgradeOptions.get(UpgradeOptions.damage).currentValue;
+    }
+
+    get rocketSpeed()
+    {
+        return this.upgradeOptions.get(UpgradeOptions.rocketSpeed).currentValue;
+    }
+
+    get reloadTime()
+    {
+        return this.upgradeOptions.get(UpgradeOptions.reloadTime).currentValue;
+    }
+
+    calculate(deltaTime, enemies) {   
         if (!this.currentTarget)
         {
-            this.currentTarget = selectTarget(enemies);
+            const targets = this.aimAlgorithm.getSortedTargets(enemies, this);
+            this.currentTarget = targets.length == 0 ? null : targets[0];
         }
 
-        aim(this.currentTarget);
+        this.aim(this.currentTarget);
 
-        if (!currentCooldown) 
+        if (this.reloadTimeLeft <= 0 && this.currentTarget) 
         {
             this.shoot(this.currentTarget);
+            this.currentTarget = null;
+            this.reloadTimeLeft = this.reloadTime;
         }
+        else
+        {
+            this.reloadTimeLeft -= deltaTime;
+        }
+
+        this.calculateRockets(deltaTime);
+    }
+
+    calculateRockets(deltaTime)
+    {
+        const rockets = [];
+        this.rockets.forEach((rocket) => {
+            rocket.calculate(deltaTime);
+            if (!rocket.destroyed)
+            {
+                rockets.push(rocket);
+            }
+        });
+
+        this.rockets = rockets;
+    }
+
+    shoot(enemy)
+    {
+        const rocket = new CBullet(enemy, this.damage, this.rocketSpeed, this.rocketTimeToLive, this.tilesX + 0.5, this.tilesY + 0.5, AssetType.smallRocket);
+        this.rockets.push(rocket);
+    }
+
+    aim(enemy)
+    {
+        if (!this.currentTarget) return;
+        const dx = enemy.tilesX - this.tilesX - 0.5;
+        const dy = enemy.tilesY - this.tilesY - 0.5;
+        this.rotation = Math.atan2(dy, dx);
     }
 
     upgrade() {}
@@ -197,8 +252,8 @@ export class CRocketTower extends ITower
 
     displayBase(ctx, assets, camera)
     {
-        const x = this.tileX * camera.tileSize - camera.offsetX;
-        const y = this.tileY * camera.tileSize - camera.offsetY;
+        const x = this.tilesX * camera.tileSize - camera.offsetX;
+        const y = this.tilesY * camera.tileSize - camera.offsetY;
 
         const asset = assets.getAsset(AssetType.rocketTowerBase);
         ctx.drawImage(asset.image, asset.sx, asset.sy, asset.sWidth, asset.sHeight, x, y, camera.tileSize, camera.tileSize);  
@@ -206,14 +261,18 @@ export class CRocketTower extends ITower
 
     displayHead(ctx, assets, camera)
     {
-        const x = this.tileX * camera.tileSize - camera.offsetX;
-        const y = this.tileY * camera.tileSize - camera.offsetY;
-
-        //TODO: use rotation
+        const x = (this.tilesX + 0.5) * camera.tileSize - camera.offsetX;
+        const y = (this.tilesY + 0.5) * camera.tileSize - camera.offsetY;
 
         const asset = assets.getAsset(AssetType.rocketTowerHead);
-        ctx.drawImage(asset.image, asset.sx, asset.sy, asset.sWidth, asset.sHeight, x, y, camera.tileSize, camera.tileSize);  
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(this.rotation);
+        ctx.drawImage(asset.image, asset.sx, asset.sy, asset.sWidth, asset.sHeight, -camera.tileSize/2, -camera.tileSize/2, camera.tileSize, camera.tileSize);  
+        ctx.restore();
     }
 
-    displayRockets(ctx, assets, camera) {}
+    displayRockets(ctx, assets, camera) {
+        this.rockets.forEach(rocket => rocket.display(ctx, assets, camera));
+    }
 }

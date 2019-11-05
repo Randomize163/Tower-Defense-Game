@@ -57,8 +57,14 @@ export class CEnemy extends IGameObject
 
     calculate(deltaTime)
     {
+        if (this.destroyed)
+        {
+            return;
+        }
+
         if (this.finishedPath)
         {
+            this.destroy();
             return;
         }
 
@@ -78,6 +84,11 @@ export class CEnemy extends IGameObject
             this.finishedPath = true;
             console.log("Enemy finished path");
         }
+    }
+
+    destroy()
+    {
+        this.destroyed = true;
     }
 
     displayModel(ctx, assets, camera)
@@ -139,6 +150,11 @@ export class CEnemy extends IGameObject
 
     display(ctx, assets, camera)
     {
+        if (this.destroyed)
+        {
+            return;
+        }
+
         this.displayModel(ctx, assets, camera);
         this.displayHealh(ctx, assets, camera);
     }
@@ -148,7 +164,7 @@ export class CEnemy extends IGameObject
         if (this.hp <= damage)
         {
             this.hp = 0;
-            this.die();
+            this.destroy();
             return;
         }
 

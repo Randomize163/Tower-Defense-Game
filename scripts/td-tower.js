@@ -142,7 +142,7 @@ export class CRocketTower extends ITower
                     "cost": 50,
                     "currentLevel": 0,
                     "maxLevel": 5,
-                    "currentValue": 15,
+                    "currentValue": 20,
                 }
             ],
             [
@@ -160,7 +160,7 @@ export class CRocketTower extends ITower
                     "cost": 50,
                     "currentLevel": 0,
                     "maxLevel": 5,
-                    "currentValue": 1000,
+                    "currentValue": 500,
                 } 
             ],
             [

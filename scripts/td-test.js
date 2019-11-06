@@ -49,9 +49,9 @@ class CTest
         const canvas = document.getElementById('game');
         const ctx = canvas.getContext('2d');
 
-        let level = new CRandomLevel(6,3);
+        let level = new CRandomLevel(3,2);
 
-        const camera = new Camera(ctx.canvas.clientWidth, ctx.canvas.clientHeight, 64);
+        const camera = new Camera(ctx.canvas.clientWidth, ctx.canvas.clientHeight, 75);
         
         const enemies = [];
         let runningEnemies = [];
@@ -64,7 +64,7 @@ class CTest
             }
             else 
             {
-                enemy = new CEnemy(level.getBegin()[0] + Math.random(), level.getBegin()[1] + Math.random() , 0, 0.001, 5000, 100, 0.1, AssetType.enemyTankGreen);
+                enemy = new CEnemy(level.getBegin()[0] + Math.random(), level.getBegin()[1] + Math.random() , 0, 0.001, 1000, 100, 0.1, AssetType.enemyTankGreen);
             }
             
             enemy.setPath(level.getPath());
@@ -72,7 +72,7 @@ class CTest
             enemies.push(enemy);
         }
 
-        let towersCount = 40;
+        let towersCount = 400;
         const towers = [];
         for (let i = 0; i < level.layers[0].tilesMap.length; i++)
         {
@@ -82,7 +82,7 @@ class CTest
                 {
                     if (level.layers[0].tilesMap[i][j] == AssetType.towerTile)
                     {
-                        if (randomBoolWithProbability(0.4))
+                        if (randomBoolWithProbability(1))
                         {
                             const tower = new CRocketTower(i, j, new CTargetSelectHighestHp());
                             towers.push(tower);
@@ -93,7 +93,7 @@ class CTest
             }
         }
 
-        const timeDelta = 20;
+        const timeDelta = 15;
         setInterval(() => {
                 ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
                 

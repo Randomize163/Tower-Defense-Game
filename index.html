@@ -5,6 +5,8 @@
     <title>Tower Defense Game</title>
   </head>
   <body>
+    <!---  SVG import   -->
+    <svg xmlns="http://www.w3.org/2000/svg" style="display: none;"><symbol id="fullscreen" viewBox="0 0 298.667 298.667"><title>fullscreen</title><polygon points="42.667,192 0,192 0,298.667 106.667,298.667 106.667,256 42.667,256 "/><polygon points="0,106.667 42.667,106.667 42.667,42.667 106.667,42.667 106.667,0 0,0 "/><polygon points="192,0 192,42.667 256,42.667 256,106.667 298.667,106.667 298.667,0 "/><polygon points="256,256 192,256 192,298.667 298.667,298.667 298.667,192 256,192 "/></symbol><symbol id="exit-full-screen" viewBox="0 0 32 32"><title>exit-full-screen</title><polygon points="24.586,27.414 29.172,32 32,29.172 27.414,24.586 32,20 20,20 20,32 "/><polygon points="0,12 12,12 12,0 7.414,4.586 2.875,0.043 0.047,2.871 4.586,7.414 "/><polygon points="0,29.172 2.828,32 7.414,27.414 12,32 12,20 0,20 4.586,24.586 "/><polygon points="20,12 32,12 27.414,7.414 31.961,2.871 29.133,0.043 24.586,4.586 20,0 "/></symbol></svg>
     <link href="styles/style.css" rel="stylesheet">
     <div class="grid-container">
       <header id="grid-item-header">
@@ -17,6 +19,22 @@
 
       <div id="grid-item-game">
         <canvas id="game" width="1024" height="650"></canvas>
+        <div class="flex-container" id="game-header">
+          <div class="header-output" id="health">
+            <img src="images/hp-heart.png" width="40px" height="40px"></img>
+            <p1 id="hp-value">100</p1>
+          </div>
+          <div class="header-output" id="coins">
+            <img src="images/coin.png" width="40px" height="40px"></img>
+            <p1 id="coin-value">100</p1>
+          </div>
+          <div class="header-output" id="fullscreen">
+            <svg class="fullscreen-icon">
+              <use xlink:href="#fullscreen" /> <!-- "#exit-full-screen" -->
+            </svg>
+          </div>
+        </div>
+        <div id="game-left-menu"></div>
       </div>
 
       <div id="grid-item-scoreboard">
@@ -28,4 +46,5 @@
       </div>
     </div>
   </body>
+  <script type="module" src="./scripts/td-test.js"></script>
 </html>

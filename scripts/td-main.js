@@ -112,7 +112,7 @@ class GameManager
 
     async beginGame(gameParams)
     {
-        this.camera = new Camera(this.canvasInitialWidth, this.canvasInitialHeight, this.defaultTileSize, 0, 0);
+        this.camera = new Camera(this.canvasInitialWidth, this.canvasInitialHeight, gameParams.initialTileSize, 0, 0);
         this.level = new CRandomLevel(gameParams.levelParams);
         this.hp = gameParams.startHp;
         this.coins = gameParams.startCoins;
@@ -154,6 +154,7 @@ function initialize()
     const gameParams = {
         'startHp':100,
         'startCoins':500,
+        'initialTileSize':74,
         'levelParams': {
             'width':6,
             'height':3,

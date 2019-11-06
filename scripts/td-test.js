@@ -55,9 +55,18 @@ class CTest
         
         const enemies = [];
         let runningEnemies = [];
-        for (let i = 0; i < 500; i++)
+        for (let i = 0; i < 1000; i++)
         {
-            const enemy = new CEnemy(level.getBegin()[0] + Math.random(), level.getBegin()[1] + Math.random() , 0, 0.0025, 100, 100, 0.1, AssetType.enemyTankGreen);
+            let enemy;
+            if (randomBoolWithProbability(0.80))
+            {
+                enemy = new CEnemy(level.getBegin()[0] + Math.random(), level.getBegin()[1] + Math.random() , 0, 0.002, 100, 100, 0.1, AssetType.enemyBasic);
+            }
+            else 
+            {
+                enemy = new CEnemy(level.getBegin()[0] + Math.random(), level.getBegin()[1] + Math.random() , 0, 0.001, 5000, 100, 0.1, AssetType.enemyTankGreen);
+            }
+            
             enemy.setPath(level.getPath());
 
             enemies.push(enemy);
@@ -114,7 +123,7 @@ class CTest
         for (let i = 0; i < enemies.length; i++)
         {
             runningEnemies.push(enemies[i]); 
-            await sleep(300);
+            await sleep(500);
         }   
     }
 }

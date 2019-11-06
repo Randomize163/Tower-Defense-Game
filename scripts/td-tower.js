@@ -71,11 +71,16 @@ export class CBullet extends IGameObject
         this.tilesY = y;
         this.rotation = rotation;
 
-        if (distance(this.tilesX, this.tilesY, this.enemy.tilesX, this.enemy.tilesY) < this.destinationDistanceThreshold)
+        if (this.distanceToEnemy() < this.destinationDistanceThreshold)
         {
             this.enemy.hit(this.damage);
             this.destroy();
         }
+    }
+
+    distanceToEnemy()
+    {
+        return distance(this.tilesX, this.tilesY, this.enemy.tilesX, this.enemy.tilesY);
     }
 
     getNextPosition(deltaTime)
@@ -85,7 +90,7 @@ export class CBullet extends IGameObject
         const dy = destY - this.tilesY;
         const angle = Math.atan2(dy, dx);
 
-        const step = deltaTime * this.speed;
+        const step = Math.min(deltaTime * this.speed, this.distanceToEnemy());
         const stepX = step * Math.cos(angle);
         const stepY = step * Math.sin(angle);
 
@@ -164,7 +169,7 @@ export class CRocketTower extends ITower
                     "cost": 50,
                     "currentLevel": 0,
                     "maxLevel": 5,
-                    "currentValue": 0.025,
+                    "currentValue": 0.005,
                 } 
             ],
         ]);

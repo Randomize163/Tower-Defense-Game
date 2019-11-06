@@ -86,6 +86,11 @@ p1 {
     border: 30px solid transparent;
     border-image: url(../images/border.png) 33% round; 
     position: relative;
+    background-image: url("../images/towerDefense_tile241_background.png");
+}
+
+.center {
+    text-align: center;
 }
 
 #game {
@@ -113,14 +118,14 @@ p1 {
     vertical-align: middle;
 }
 
-.fullscreen-icon {
+#fullscreen-icon {
     fill: white;
     width: 40px;
     height: 40px;
     filter: drop-shadow(2px 3px 0px #aaa);
 }
 
-.fullscreen-icon:hover
+#fullscreen-icon:hover
 {
     fill: #ce2514;
     cursor: pointer;

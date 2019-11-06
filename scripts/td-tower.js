@@ -104,8 +104,7 @@ export class CBullet extends IGameObject
 
     destroy()
     {
-        this.destroyed = true;  
-        console.log("Bullet finished");
+        this.destroyed = true;
     }
 
     display(ctx, assets, camera)

@@ -18,7 +18,9 @@
       </div>
 
       <div id="grid-item-game">
-        <canvas id="game" width="1024" height="650"></canvas>
+        <div class="center">
+          <canvas id="game" width="1024" height="650"></canvas>
+        </div>
         <div class="flex-container" id="game-header">
           <div class="header-output" id="health">
             <img src="images/hp-heart.png" width="40px" height="40px"></img>
@@ -26,11 +28,11 @@
           </div>
           <div class="header-output" id="coins">
             <img src="images/coin.png" width="40px" height="40px"></img>
-            <p1 id="coin-value">100</p1>
+            <p1 id="coins-value">100</p1>
           </div>
           <div class="header-output" id="fullscreen">
-            <svg class="fullscreen-icon">
-              <use xlink:href="#fullscreen" /> <!-- "#exit-full-screen" -->
+            <svg id="fullscreen-icon">
+              <use xlink:href="#fullscreen" id="fullscreen-hashtag" />  <!--"#exit-full-screen" -->
             </svg>
           </div>
         </div>
@@ -46,5 +48,6 @@
       </div>
     </div>
   </body>
+  <script type="module" src="./scripts/td-main.js"></script>
   <script type="module" src="./scripts/td-test.js"></script>
 </html>

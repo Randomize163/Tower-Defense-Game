@@ -170,6 +170,4 @@ export class CEnemy extends IGameObject
 
         this.hp -= damage;
     }
-
-    die() {}
 }

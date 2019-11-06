@@ -1,6 +1,6 @@
 
-import { CFloorLayer } from "./td-layer-floor.js";
-import { CDecorationsLayer } from "./td-layer-decorations.js";
+import { CRandomFloorLayer } from "./td-layer-floor.js";
+import { CRandomDecorationsLayer } from "./td-layer-decorations.js";
 import { CKenneyAssetsCollection } from "./td-asset.js";
 import { ILevel } from "./td-level.js";
 import { sleep } from "./td-utils.js";
@@ -8,18 +8,16 @@ import { Camera } from "./td-camera.js";
 
 export class CRandomLevel extends ILevel
 {
-    constructor(width, height)
+    constructor(params)
     {
-        super(width, height);
+        super(params.width, params.height);
 
-        let floor = new CFloorLayer(width, height);
+        let floor = new CRandomFloorLayer(params.width, params.height, params.floorParams);
         this.width = floor.width;
         this.height = floor.height;
 
-        let decorations = new CDecorationsLayer(this.width, this.height);
-        decorations.generateRandomDecorations(floor);
-        decorations.addBeginAndEndDecorations(floor);
-        
+        let decorations = new CRandomDecorationsLayer(this.width, this.height, floor, params.decorationsParams);
+
         this.layers.push(floor);
         this.layers.push(decorations);
     }

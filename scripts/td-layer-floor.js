@@ -4,7 +4,7 @@ import { AssetType, CKenneyAssetsCollection } from './td-asset.js';
 import { getNeighboursCoordinates, randomBoolWithProbability, sleep } from './td-utils.js';
 import { Camera } from './td-camera.js';
 
-export class CFloorLayer extends ILayer
+export class CRandomFloorLayer extends ILayer
 {
     constructor(width, height, params = {'towerTilesFillFactor':0.6})
     {

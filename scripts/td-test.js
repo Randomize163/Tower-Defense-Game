@@ -49,7 +49,7 @@ class CTest
         const canvas = document.getElementById('game');
         const ctx = canvas.getContext('2d');
 
-        let level = new CRandomLevel(3,2);
+        let level = new CRandomLevel(6,3);
 
         const camera = new Camera(ctx.canvas.clientWidth, ctx.canvas.clientHeight, 75);
         

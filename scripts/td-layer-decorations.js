@@ -23,11 +23,13 @@ const decorationsFillFactorDefault =
     },
 ];
 
-export class CDecorationsLayer extends ILayer
+export class CRandomDecorationsLayer extends ILayer
 {
-    constructor(width, height)
+    constructor(width, height, floorLayer, params)
     {
         super(width, height);
+        this.generateRandomDecorations(floorLayer, params.fillFactors)
+        this.addBeginAndEndDecorations(floorLayer);
     }
 
     generateRandomDecorations(floorLayer, fillFactors = decorationsFillFactorDefault)

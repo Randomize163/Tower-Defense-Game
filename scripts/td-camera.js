@@ -41,4 +41,11 @@ export class Camera
     {
         assert(false); // Not Impl
     }
+
+    changeTileSize(tileSize)
+    {
+        this.tileSize = tileSize;
+
+        this.updateDependantMembers();
+    }
 }

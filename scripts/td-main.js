@@ -3,19 +3,6 @@ import { Camera } from './td-camera.js';
 import { CRandomLevel } from './td-level-random.js';
 import { AssetType, CKenneyAssetsCollection } from './td-asset.js';
 
-export class IGameHeader 
-{
-    coinsElement;
-    hpElement;
-    fullscreenElement;
-
-    updateHp(hp) {}
-
-    updateCoins(coins) {}
-
-    changeFullscreenState(state) {}
-}
-
 const FullscreenState = Object.freeze(
 {
     "fullscreen":0,
@@ -55,6 +42,55 @@ class CGameHeader
     }
 }
 
+class CGameBuildMenu
+{
+    constructor(assets)
+    {
+        this.assets = assets;
+        
+        this.gameBuildsMenu = document.getElementById("game-builds-menu");
+        this.hideBuildsMenu();
+
+        this.buildOptionTemplateElement = document.getElementById("build-option-template");
+        this.buildOptionTemplateElement.style.display = 'none';
+
+    }
+
+    displayBuildsOptions(buildOptions)
+    {
+        buildOptions.forEach( (option) => {
+            const newElement = this.buildOptionTemplateElement.cloneNode(true);
+            newElement.removeAttribute('id');
+            const canvas = newElement.querySelector('.build-option-canvas');
+            const ctx = canvas.getContext('2d');
+            option.layers.forEach( (assetType) => {
+                this.displayBuildPicture(ctx, canvas.width, canvas.height, assetType);
+            });
+
+            newElement.style.display = 'block';
+            this.gameBuildsMenu.appendChild(newElement);
+        });
+
+        this.showBuildsMenu();
+    }
+
+    displayBuildPicture(ctx, width, height, assetType)
+    {
+        const asset = this.assets.getAsset(assetType);
+        ctx.drawImage(asset.image, asset.sx, asset.sy, asset.sWidth, asset.sHeight, 0, 0, width, height);
+    }
+
+    hideBuildsMenu()
+    {
+        this.gameBuildsMenu.style.display = 'none';
+    }
+
+    showBuildsMenu()
+    {
+        this.gameBuildsMenu.style.display = 'block';
+    }
+}
+
 let gameManager = null;
 
 class GameManager 
@@ -64,7 +100,7 @@ class GameManager
         this.fullscreenElement = document.getElementById('grid-item-game');
         
         this.header = new CGameHeader(document.getElementById("coins-value"), document.getElementById("hp-value"), document.getElementById('fullscreen-hashtag'));
-        
+
         this.canvas = document.getElementById('game');
         this.ctx = this.canvas.getContext('2d');
         this.canvasInitialWidth = this.canvas.width;
@@ -77,17 +113,35 @@ class GameManager
     adjustToMinimizedScreen() 
     {
         this.header.changeFullscreenState(FullscreenState.exitFullscreen);
-        this.canvas.width = this.canvasInitialWidth;
-        this.canvas.height = this.canvasInitialHeight;
+        this.canvas.width = this.canvasInitialWidth - 50;
+        this.canvas.height = this.canvasInitialHeight - 10;
         this.camera.changeResolution(this.canvas.width, this.canvas.height);
+        
+        this.adjustToFitScreenSize();
+    }
+
+    adjustToFitScreenSize()
+    {
+        assert(this.level);
+        
+        const tileSizeToFitWidth = Math.floor(this.canvas.width / this.level.width);
+        const tileSizeToFitHeight = Math.floor(this.canvas.height / this.level.height);
+        const tileSizeToFitScreen = Math.min(tileSizeToFitWidth, tileSizeToFitHeight);
+        
+        this.canvas.height = this.level.height * tileSizeToFitScreen;
+        this.canvas.width = this.level.width * tileSizeToFitScreen;
+        
+        this.camera.changeTileSize(tileSizeToFitScreen);
     }
 
     adjustToFullScreen()
     {
         this.header.changeFullscreenState(FullscreenState.fullscreen);
-        this.canvas.width = screen.availWidth;
-        this.canvas.height = screen.availHeight;
+        this.canvas.width = screen.availWidth - 50; // substract boarder size
+        this.canvas.height = screen.availHeight - 50;
         this.camera.changeResolution(this.canvas.width, this.canvas.height);
+
+        this.adjustToFitScreenSize();
     }
 
     onFullscreenClick()
@@ -119,12 +173,17 @@ class GameManager
         
         this.assets = new CKenneyAssetsCollection();
         await this.assets.initialize();
+        this.buildMenu = new CGameBuildMenu(this.assets);
+        
+        this.adjustToFitScreenSize();
         this.startGameLoop();
     }
 
     gameLoop(timeDelta)
     {
         this.level.display(this.ctx, this.assets, this.camera);
+        this.header.updateCoins(this.coins);
+        this.header.updateHp(this.hp);
     }
 
     static gameLoopHelper(timestamp)
@@ -197,6 +256,30 @@ function initializeCallbacks()
     document.onfullscreenchange = () => {
         if (!document.fullscreen) gameManager.adjustToMinimizedScreen();
     };
+
 }
 
 initialize();
+
+// displayBuildsOptions test
+/*const buildOptions = [
+    {
+        'description':'Rocket Tower',
+        'cost':100,
+        'layers': [
+            AssetType.rocketTowerBase,
+            AssetType.rocketTowerHead,
+        ],
+    },
+    {
+        'description':'Rocket Tower',
+        'cost':100,
+        'layers': [
+            AssetType.rocketTowerBase,
+            AssetType.rocketTowerHead,
+        ],
+    },
+];
+
+this.buildMenu.displayBuildsOptions(buildOptions);
+*/

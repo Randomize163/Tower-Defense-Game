@@ -65,6 +65,13 @@ h1,h2,h3,h4,h5,h6,p1 {
                  0 20px 20px rgba(0,0,0,.15);
 }
 
+p2, p3 {
+    font: bold 100px/1 "Helvetica Neue", Helvetica, Arial, sans-serif;
+    color: #fff;
+    text-align: center;
+    text-shadow: 0 1px 0 #ccc;
+}
+
 h1 {
    font-size: 90px;
 }
@@ -79,6 +86,16 @@ h3 {
 
 p1 {
     font-size: 40px;
+    text-align: unset;
+}
+
+p2 {
+    font-size: 20px;
+    text-align: unset;
+}
+
+p3 {
+    font-size: 15px;
     text-align: unset;
 }
 
@@ -105,6 +122,21 @@ p1 {
     margin: 0 10px;
 }
 
+.margin-auto {
+    margin: auto;
+}
+
+#game-builds-menu {
+    top: 50px;
+    margin: 10% 0;
+    right: 0;
+    /*min-height: 50%;*/
+    background-color: rgba(82, 81, 81, 0.28);
+    position: absolute;
+    border-radius: 6px 0px 0px 6px;
+    flex-direction: column;
+}
+
 #game-header {
     background-color: rgba(82, 81, 81, 0.28);
     position: absolute;
@@ -115,6 +147,27 @@ p1 {
 }
 
 .header-output > * {
+    vertical-align: middle;
+}
+
+.build-option {
+    text-align: center;
+    border: 2px solid rgba(82, 81, 81, 0.9);
+    border-radius: 6px;
+    padding: 5px;
+    margin: 5px;
+    background-color: rgba(82, 81, 81, 0.6);
+}
+
+.build-option:hover {
+    background-color: rgba(82, 81, 81, 0.9);
+}
+
+.build-option-canvas {
+    display: block;
+}
+
+.build-option-price > * {
     vertical-align: middle;
 }
 

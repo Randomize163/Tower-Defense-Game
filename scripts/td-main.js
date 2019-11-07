@@ -3,10 +3,10 @@ import { Camera } from './td-camera.js';
 import { CRandomLevel } from './td-level-random.js';
 import { AssetType, CKenneyAssetsCollection } from './td-asset.js';
 
-const FullscreenState = Object.freeze(
+const ScreenState = Object.freeze(
 {
     "fullscreen":0,
-    "exitFullscreen":1,
+    "minimized":1,
 });
 
 class CGameHeader
@@ -28,15 +28,15 @@ class CGameHeader
         this.coinsElement.innerHTML = coins.toString();
     }
 
-    changeFullscreenState(state) 
+    changeScreenState(state) 
     {
-        if (state == FullscreenState.exitFullscreen)
+        if (state == ScreenState.minimized)
         {
             this.fullscreenElement.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', "#fullscreen");
         }
         else
         {
-            assert(state == FullscreenState.fullscreen);
+            assert(state == ScreenState.fullscreen);
             this.fullscreenElement.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', "#exit-full-screen");
         }
     }
@@ -98,13 +98,14 @@ class GameManager
     constructor()
     {
         this.fullscreenElement = document.getElementById('grid-item-game');
-        
+        this.borderSize = this.fullscreenElement.style.borderWidth;
+
         this.header = new CGameHeader(document.getElementById("coins-value"), document.getElementById("hp-value"), document.getElementById('fullscreen-hashtag'));
 
         this.canvas = document.getElementById('game');
         this.ctx = this.canvas.getContext('2d');
-        this.canvasInitialWidth = this.canvas.width;
-        this.canvasInitialHeight = this.canvas.height;
+        this.canvasMinimizedWidth = this.canvas.width;
+        this.canvasMinimizedHeight = this.canvas.height;
         this.defaultTileSize = 64;
 
         this.lastTimeStamp = null;
@@ -112,12 +113,23 @@ class GameManager
 
     adjustToMinimizedScreen() 
     {
-        this.header.changeFullscreenState(FullscreenState.exitFullscreen);
-        this.canvas.width = this.canvasInitialWidth - 50;
-        this.canvas.height = this.canvasInitialHeight - 10;
+        this.header.changeScreenState(ScreenState.minimized);
+
+        const tileSizeToFitWidth = Math.floor(this.canvas.width / this.level.width);
+        const tileSizeToFitHeight = Math.floor(this.canvas.height / this.level.height);
+        const tileSizeToFitScreen = Math.min(tileSizeToFitWidth, tileSizeToFitHeight);
+        
+        this.canvas.height = this.canvasMinimizedHeight = this.level.height * tileSizeToFitScreen;
+        this.canvas.width = this.canvasMinimizedWidth = this.level.width * tileSizeToFitScreen; // Need to increase width, because of Math.floor()  
+        
         this.camera.changeResolution(this.canvas.width, this.canvas.height);
         
         this.adjustToFitScreenSize();
+    }
+
+    updateScreenSize(width, height)
+    {
+        
     }
 
     adjustToFitScreenSize()
@@ -128,15 +140,15 @@ class GameManager
         const tileSizeToFitHeight = Math.floor(this.canvas.height / this.level.height);
         const tileSizeToFitScreen = Math.min(tileSizeToFitWidth, tileSizeToFitHeight);
         
-        this.canvas.height = this.level.height * tileSizeToFitScreen;
-        this.canvas.width = this.level.width * tileSizeToFitScreen;
+        this.canvas.height = this.canvasMinimizedHeight = this.level.height * tileSizeToFitScreen;
+        this.canvas.width = this.canvasMinimizedWidth = this.level.width * tileSizeToFitScreen; // Need to increase width, because of Math.floor()  
         
-        this.camera.changeTileSize(tileSizeToFitScreen);
+        this.camera.update(0, 0, this.canvas.width, this.canvas.height, tileSizeToFitScreen);
     }
 
     adjustToFullScreen()
     {
-        this.header.changeFullscreenState(FullscreenState.fullscreen);
+        this.header.changeScreenState(ScreenState.fullscreen);
         this.canvas.width = screen.availWidth - 50; // substract boarder size
         this.canvas.height = screen.availHeight - 50;
         this.camera.changeResolution(this.canvas.width, this.canvas.height);
@@ -166,8 +178,8 @@ class GameManager
 
     async beginGame(gameParams)
     {
-        this.camera = new Camera(this.canvasInitialWidth, this.canvasInitialHeight, gameParams.initialTileSize, 0, 0);
         this.level = new CRandomLevel(gameParams.levelParams);
+        this.camera = new Camera(this.canvas.width, this.canvas.height, gameParams.initialTileSize, 0, 0, this.level.width, this.level.height);
         this.hp = gameParams.startHp;
         this.coins = gameParams.startCoins;
         
@@ -181,6 +193,7 @@ class GameManager
 
     gameLoop(timeDelta)
     {
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         this.level.display(this.ctx, this.assets, this.camera);
         this.header.updateCoins(this.coins);
         this.header.updateHp(this.hp);
@@ -202,6 +215,13 @@ class GameManager
     stopGameLoop()
     {
         window.cancelAnimationFrame(this.loopCancelationId);
+    }
+
+    onWheel(event)
+    {
+        console.log(event);
+        const tileSizeDelta = -event.deltaY * 0.05;
+        this.camera.changeTileSize(this.camera.tileSize + tileSizeDelta);
     }
 }
 
@@ -256,7 +276,9 @@ function initializeCallbacks()
     document.onfullscreenchange = () => {
         if (!document.fullscreen) gameManager.adjustToMinimizedScreen();
     };
-
+    
+    const gameElement = document.getElementById('game');
+    gameElement.onwheel = (event) => gameManager.onWheel(event);
 }
 
 initialize();

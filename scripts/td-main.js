@@ -235,8 +235,7 @@ class GameManager
 
     onClick(event)
     {
-        console.log(event);
-        //this.clickPoint = [event.c]
+        console.log(this.display.getTileFromCoordinates(this.mouseCoordinatesOnCanvas(event)));
     }
 }
 
@@ -250,8 +249,8 @@ function initialize()
         'startCoins':500,
         'initialTileSize':74,
         'levelParams': {
-            'width':3,
-            'height':5,
+            'width':5,
+            'height':3,
             'floorParams': {
                 'towerTilesFillFactor':0.6,
             },

@@ -191,4 +191,15 @@ export class Display
             this.ctx.drawImage(asset.image, asset.sx, asset.sy, asset.sWidth, asset.sHeight, absoluteX, absoluteY, this.tileSize, this.tileSize);  
         }
     }
+
+    getTileFromCoordinates(coordinate)
+    {
+        const [x, y] = coordinate;
+        assert(this.coordinateIsOnPicture(x, y));
+
+        const tileX = (x - this.pictureWidth) / this.tileSize;
+        const tileY = (y - this.pictureHeight) / this.tileSize;
+
+        return [tileX, tileY];
+    }
 }

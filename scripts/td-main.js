@@ -204,15 +204,12 @@ class GameManager
         this.mouse.up = true;
         this.mouse.down = false;
         this.mouse.drag = false;
-        this.mouse.lastCoordinate = null;
-        this.mouse.downCoordinate = null;
     }
 
     onMouseDown(event)
     {
         this.mouse.down = true;
         this.mouse.up = false;
-        this.mouse.downCoordinate = [event.clientX, event.clientY];
     }
 
     onMouseMove(event)
@@ -221,15 +218,7 @@ class GameManager
         if (this.mouse.down == true)
         {
             this.mouse.drag = true;
-            const currentCoordinate = [event.clientX, event.clientY]
-
-            if (!this.mouse.lastCoordinate) {
-                assert(this.mouse.downCoordinate);
-                this.mouse.lastCoordinate = this.mouse.downCoordinate;
-            } 
-            
-            this.display.movePicture(currentCoordinate[0] - this.mouse.lastCoordinate[0], currentCoordinate[1] - this.mouse.lastCoordinate[1]);
-            this.mouse.lastCoordinate = currentCoordinate;
+            this.display.movePicture(event.movementX, event.movementY);
         }
     }
 
@@ -243,6 +232,12 @@ class GameManager
     {
         this.display.fitPictureToDisplay(this.canvas.width, this.canvas.height);
     }
+
+    onClick(event)
+    {
+        console.log(event);
+        //this.clickPoint = [event.c]
+    }
 }
 
 function initialize()
@@ -255,8 +250,8 @@ function initialize()
         'startCoins':500,
         'initialTileSize':74,
         'levelParams': {
-            'width':5,
-            'height':3,
+            'width':3,
+            'height':5,
             'floorParams': {
                 'towerTilesFillFactor':0.6,
             },
@@ -303,8 +298,9 @@ function initializeCallbacks()
     gameElement.onwheel = (event) => gameManager.onWheel(event);
 
     gameElement.onmousedown = (event) => gameManager.onMouseDown(event);
-    gameElement.onmouseup = (event) => gameManager.onMouseUp(event); 
-    gameElement.onmousemove = (event) => gameManager.onMouseMove(event);
+    document.addEventListener("mouseup", (event) => gameManager.onMouseUp(event));
+    document.addEventListener("mousemove", (event) => gameManager.onMouseMove(event));
+    gameElement.onclick = (event) => gameManager.onClick(event);
 }
 
 initialize();

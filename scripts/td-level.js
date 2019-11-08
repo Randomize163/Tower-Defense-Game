@@ -10,13 +10,9 @@ export class ILevel
         this.layers = [];
     }
 
-    //
-    // display() - ctx is a canvas.getContext('2d'); tiles is an instance of IAssetCollection
-    // ctx, tiles, camera
-    //
-    display(...args)
+    display(displayObj)
     {
         assert(this.layers.length > 0);
-        this.layers.forEach((layer) => layer.display(...args));
+        this.layers.forEach((layer) => layer.display(displayObj));
     }
 }

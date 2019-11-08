@@ -16,25 +16,14 @@ export class ILayer extends IDisplayable
     //
     // overrides IDisplayable::display
     //
-    display(ctx, assets, camera)
+    display(displayObj)
     {
-        const lastTileIndexX = Math.min(camera.lastTileIndexX, this.width - 1);
-        const lastTileIndexY = Math.min(camera.lastTileIndexY, this.height - 1);
-
-        let dx = camera.firstTileIndexX * camera.tileSize;
-        for (let i = camera.firstTileIndexX; i <= lastTileIndexX; i++)
+        for (let i = 0; i < this.tilesMap.length; i++)
         {
-            let dy = camera.firstTileIndexY * camera.tileSize;
-            for (let j = camera.firstTileIndexY; j <= lastTileIndexY; j++)
+            for (let j = 0; j < this.tilesMap[0].length; j++)
             {
-                if (this.tilesMap[i][j] != AssetType.transparentTile)
-                {
-                    const asset = assets.getAsset(this.tilesMap[i][j]);
-                    ctx.drawImage(asset.image, asset.sx, asset.sy, asset.sWidth, asset.sHeight, dx, dy, camera.tileSize, camera.tileSize);  
-                }
-                dy += camera.tileSize;
+                displayObj.drawImage(this.tilesMap[i][j], i, j);
             }
-            dx += camera.tileSize;
         }
     }
 }

@@ -1,5 +1,5 @@
 import { assert } from './td-utils.js'
-import { Camera } from './td-camera.js';
+import { Camera, Display } from './td-camera.js';
 import { CRandomLevel } from './td-level-random.js';
 import { AssetType, CKenneyAssetsCollection } from './td-asset.js';
 
@@ -109,51 +109,28 @@ class GameManager
         this.defaultTileSize = 64;
 
         this.lastTimeStamp = null;
+        
+        this.mouse = {};
     }
 
     adjustToMinimizedScreen() 
     {
         this.header.changeScreenState(ScreenState.minimized);
 
-        const tileSizeToFitWidth = Math.floor(this.canvas.width / this.level.width);
-        const tileSizeToFitHeight = Math.floor(this.canvas.height / this.level.height);
-        const tileSizeToFitScreen = Math.min(tileSizeToFitWidth, tileSizeToFitHeight);
+        this.canvas.width = this.canvasMinimizedWidth; 
+        this.canvas.height = this.canvasMinimizedHeight;
         
-        this.canvas.height = this.canvasMinimizedHeight = this.level.height * tileSizeToFitScreen;
-        this.canvas.width = this.canvasMinimizedWidth = this.level.width * tileSizeToFitScreen; // Need to increase width, because of Math.floor()  
-        
-        this.camera.changeResolution(this.canvas.width, this.canvas.height);
-        
-        this.adjustToFitScreenSize();
-    }
-
-    updateScreenSize(width, height)
-    {
-        
-    }
-
-    adjustToFitScreenSize()
-    {
-        assert(this.level);
-        
-        const tileSizeToFitWidth = Math.floor(this.canvas.width / this.level.width);
-        const tileSizeToFitHeight = Math.floor(this.canvas.height / this.level.height);
-        const tileSizeToFitScreen = Math.min(tileSizeToFitWidth, tileSizeToFitHeight);
-        
-        this.canvas.height = this.canvasMinimizedHeight = this.level.height * tileSizeToFitScreen;
-        this.canvas.width = this.canvasMinimizedWidth = this.level.width * tileSizeToFitScreen; // Need to increase width, because of Math.floor()  
-        
-        this.camera.update(0, 0, this.canvas.width, this.canvas.height, tileSizeToFitScreen);
+        this.display.fitPictureToDisplay(this.canvas.width, this.canvas.height);
     }
 
     adjustToFullScreen()
     {
         this.header.changeScreenState(ScreenState.fullscreen);
-        this.canvas.width = screen.availWidth - 50; // substract boarder size
-        this.canvas.height = screen.availHeight - 50;
-        this.camera.changeResolution(this.canvas.width, this.canvas.height);
 
-        this.adjustToFitScreenSize();
+        this.canvas.width = screen.availWidth - 60; // substract border size
+        this.canvas.height = screen.availHeight - 60;
+
+        this.display.fitPictureToDisplay(this.canvas.width, this.canvas.height);
     }
 
     onFullscreenClick()
@@ -179,22 +156,21 @@ class GameManager
     async beginGame(gameParams)
     {
         this.level = new CRandomLevel(gameParams.levelParams);
-        this.camera = new Camera(this.canvas.width, this.canvas.height, gameParams.initialTileSize, 0, 0, this.level.width, this.level.height);
         this.hp = gameParams.startHp;
         this.coins = gameParams.startCoins;
         
         this.assets = new CKenneyAssetsCollection();
         await this.assets.initialize();
+        this.display = new Display(this.ctx, this.assets, this.canvasMinimizedWidth, this.canvasMinimizedHeight, this.level.width, this.level.height);
         this.buildMenu = new CGameBuildMenu(this.assets);
         
-        this.adjustToFitScreenSize();
         this.startGameLoop();
     }
 
     gameLoop(timeDelta)
     {
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        this.level.display(this.ctx, this.assets, this.camera);
+        this.display.clear();
+        this.level.display(this.display);
         this.header.updateCoins(this.coins);
         this.header.updateHp(this.hp);
     }
@@ -219,9 +195,53 @@ class GameManager
 
     onWheel(event)
     {
-        console.log(event);
         const tileSizeDelta = -event.deltaY * 0.05;
-        this.camera.changeTileSize(this.camera.tileSize + tileSizeDelta);
+        this.display.zoom(tileSizeDelta, this.mouseCoordinatesOnCanvas(event));
+    }
+
+    onMouseUp(event)
+    {
+        this.mouse.up = true;
+        this.mouse.down = false;
+        this.mouse.drag = false;
+        this.mouse.lastCoordinate = null;
+        this.mouse.downCoordinate = null;
+    }
+
+    onMouseDown(event)
+    {
+        this.mouse.down = true;
+        this.mouse.up = false;
+        this.mouse.downCoordinate = [event.clientX, event.clientY];
+    }
+
+    onMouseMove(event)
+    {
+        this.mouse.move = true;
+        if (this.mouse.down == true)
+        {
+            this.mouse.drag = true;
+            const currentCoordinate = [event.clientX, event.clientY]
+
+            if (!this.mouse.lastCoordinate) {
+                assert(this.mouse.downCoordinate);
+                this.mouse.lastCoordinate = this.mouse.downCoordinate;
+            } 
+            
+            this.display.movePicture(currentCoordinate[0] - this.mouse.lastCoordinate[0], currentCoordinate[1] - this.mouse.lastCoordinate[1]);
+            this.mouse.lastCoordinate = currentCoordinate;
+        }
+    }
+
+    mouseCoordinatesOnCanvas(event)
+    {
+        const rect = this.canvas.getBoundingClientRect();
+        return [event.clientX - rect.left, event.clientY - rect.top];
+    }
+
+    onCenterFocusClick()
+    {
+        this.display.fitPictureToDisplay(this.canvas.width, this.canvas.height);
     }
 }
 
@@ -235,7 +255,7 @@ function initialize()
         'startCoins':500,
         'initialTileSize':74,
         'levelParams': {
-            'width':6,
+            'width':5,
             'height':3,
             'floorParams': {
                 'towerTilesFillFactor':0.6,
@@ -276,9 +296,15 @@ function initializeCallbacks()
     document.onfullscreenchange = () => {
         if (!document.fullscreen) gameManager.adjustToMinimizedScreen();
     };
+
+    document.getElementById("center-focus").onclick = () => gameManager.onCenterFocusClick();
     
     const gameElement = document.getElementById('game');
     gameElement.onwheel = (event) => gameManager.onWheel(event);
+
+    gameElement.onmousedown = (event) => gameManager.onMouseDown(event);
+    gameElement.onmouseup = (event) => gameManager.onMouseUp(event); 
+    gameElement.onmousemove = (event) => gameManager.onMouseMove(event);
 }
 
 initialize();

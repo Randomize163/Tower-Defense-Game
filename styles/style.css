@@ -178,6 +178,18 @@ p3 {
     filter: drop-shadow(2px 3px 0px #aaa);
 }
 
+#center-focus {
+    fill: white;
+    filter: drop-shadow(2px 3px 0px #aaa);
+    width: 40px;
+    height: 40px;
+}
+
+#center-focus:hover {
+    fill: #ce2514;
+    cursor: pointer;
+}
+
 #fullscreen-icon:hover
 {
     fill: #ce2514;

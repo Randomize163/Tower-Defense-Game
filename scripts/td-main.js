@@ -3,6 +3,7 @@ import { Camera, Display } from './td-camera.js';
 import { CRandomLevel } from './td-level-random.js';
 import { AssetType, CKenneyAssetsCollection } from './td-asset.js';
 import { TowerType, CTowerFactory } from './td-tower-factory.js';
+import { CEnemy } from './td-enemy.js';
 
 const ScreenState = Object.freeze(
 {
@@ -163,9 +164,10 @@ class GameManager
         this.canvasMinimizedWidth = this.canvas.width;
         this.canvasMinimizedHeight = this.canvas.height;
         this.defaultTileSize = 64;
+        this.gameSpeed = 1;
 
         this.lastTimeStamp = null;
-        
+
         this.mouse = {};
     }
 
@@ -209,6 +211,25 @@ class GameManager
         }
     }
 
+    startGame()
+    {
+        const [beginX, beginY] = this.level.getBegin();
+        const enemies = [];
+        for (let i = 0; i < 100; i++)
+        {
+            const enemy = new CEnemy(beginX + Math.random(), beginY + Math.random() , 0, 0.002, 100, 100, 0.1, AssetType.enemyBasic);
+            enemy.setPath(this.level.getPath());
+            enemies.push(enemy);
+        }
+        
+        setInterval(() => {
+            if (enemies.length > 0) {
+                this.enemies.push(enemies.pop());
+            }
+        },
+        300);
+    }
+
     async beginGame(gameParams)
     {
         this.level = new CRandomLevel(gameParams.levelParams);
@@ -230,20 +251,39 @@ class GameManager
         
         this.footer.hidePauseButton();
         this.footer.showPlayButton();
-        this.gameState = GameState.paused;
+        this.gameState = GameState.notStarted;
         this.gameSpeed = 1;
     
         this.startGameLoop();
     }
 
+    calculateObjects(timeDelta)
+    {
+        this.towers.forEach((tower) => tower.calculate(timeDelta, this.enemies));
+
+        const lifeEnemies = [];
+        this.enemies.forEach((enemy) => {
+            enemy.calculate(timeDelta);
+            if (!enemy.destroyed)
+            {
+                lifeEnemies.push(enemy);
+            }
+        });
+        this.enemies = lifeEnemies;
+    }
+
     gameLoop(timeDelta)
     {
+        if (this.gameState == GameState.running)
+        {
+            this.calculateObjects(timeDelta);
+        }
+        
         this.display.clear();
         
         this.level.display(this.display);
-        this.towers.forEach((tower) => {
-            tower.display(this.display);
-        });
+        this.towers.forEach((tower) => tower.display(this.display));
+        this.enemies.forEach((enemy) => enemy.display(this.display));
 
         this.header.updateCoins(this.coins);
         this.header.updateHp(this.hp);
@@ -253,8 +293,9 @@ class GameManager
     {
         if (!gameManager.lastTimeStamp) gameManager.lastTimeStamp = timestamp;
         let timeDelta = timestamp - gameManager.lastTimeStamp;
-        gameManager.gameLoop(timeDelta);
+        gameManager.gameLoop(timeDelta * gameManager.gameSpeed);
         gameManager.loopCancelationId = window.requestAnimationFrame(GameManager.gameLoopHelper);
+        gameManager.lastTimeStamp = timestamp;
     }
 
     startGameLoop()
@@ -309,7 +350,7 @@ class GameManager
 
     onClick(event)
     {
-        if (this.gameState == GameState.paused)
+        if (this.gameState != GameState.running)
         {
             return;
         }
@@ -338,6 +379,11 @@ class GameManager
 
     onBuildTowerClick(buildDescription, buildType, tileX, tileY)
     {
+        if (this.gameState != GameState.running)
+        {
+            return;
+        }
+
         if (this.coins < buildDescription.price)
         {
             return;
@@ -362,6 +408,13 @@ class GameManager
 
     onPlayClick()
     {
+        if (this.gameState == GameState.notStarted)
+        {
+            this.gameSpeed = 1;
+            this.footer.showFastPlayButton();
+            this.startGame();
+        }
+        else
         if (this.gameState == GameState.running)
         {
             if (this.gameSpeed == 1)
@@ -376,7 +429,7 @@ class GameManager
                 this.footer.showPlayButton();
             }
         }
-
+    
         this.gameState = GameState.running;
         this.footer.showPauseButton();
     }
@@ -389,7 +442,7 @@ function initialize()
 
     const gameParams = {
         'startHp':100,
-        'startCoins':500,
+        'startCoins':1000,
         'initialTileSize':74,
         'levelParams': {
             'width':5,

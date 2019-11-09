@@ -100,7 +100,7 @@ export class CBullet extends IGameObject
             return;
         }
 
-        display.drawImage(this.assetType, this.tilesX, this.tilesY, this.rotation);  
+        display.drawImage(this.assetType, this.tilesX - 0.5, this.tilesY - 0.5, this.rotation);  
     }
 }
 
@@ -204,7 +204,7 @@ export class CRocketTower extends ITower
     display(display) 
     {
         display.drawImage(AssetType.rocketTowerBase, this.tilesX, this.tilesY);  
-        display.drawImage(AssetType.rocketTowerHead, this.tilesX, this.tilesY);  
+        display.drawImage(AssetType.rocketTowerHead, this.tilesX, this.tilesY, this.rotation);  
         this.rockets.forEach(rocket => rocket.display(display));
     }
 }

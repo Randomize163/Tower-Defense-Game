@@ -180,16 +180,51 @@ export class Display
 
         if (rotation != 0)
         {   
-            ctx.save();
-            ctx.translate(absoluteX, absoluteY);
-            ctx.rotate(rotation);
+            this.ctx.save();
+            this.ctx.translate(absoluteX + 0.5 * this.tileSize, absoluteY + 0.5 * this.tileSize);
+            this.ctx.rotate(rotation);
             this.ctx.drawImage(asset.image, asset.sx, asset.sy, asset.sWidth, asset.sHeight, -this.tileSize / 2, -this.tileSize / 2, this.tileSize, this.tileSize);  
-            ctx.restore();
+            this.ctx.restore();
         }
         else
         {
             this.ctx.drawImage(asset.image, asset.sx, asset.sy, asset.sWidth, asset.sHeight, absoluteX, absoluteY, this.tileSize, this.tileSize);  
         }
+    }
+
+    fillRect(tileX, tileY, width, height, fillStyle)
+    {
+        const absoluteX = tileX * this.tileSize + this.pictureOffsetX;
+        const absoluteY = tileY * this.tileSize + this.pictureOffsetY;
+        
+        if (absoluteX > this.width) {
+            return;
+        }
+
+        if (absoluteY > this.height) {
+            return;
+        }
+
+        this.ctx.fillStyle = fillStyle;
+        this.ctx.fillRect(absoluteX, absoluteY, width * this.tileSize, height * this.tileSize);
+    }
+
+    strokeRect(tileX, tileY, width, height, strokeStyle, lineWidth)
+    {
+        const absoluteX = tileX * this.tileSize + this.pictureOffsetX;
+        const absoluteY = tileY * this.tileSize + this.pictureOffsetY;
+        
+        if (absoluteX > this.width) {
+            return;
+        }
+
+        if (absoluteY > this.height) {
+            return;
+        }
+
+        this.ctx.strokeStyle = strokeStyle;
+        this.ctx.lineWidth = lineWidth;
+        this.ctx.strokeRect(absoluteX, absoluteY, width * this.tileSize, height * this.tileSize);
     }
 
     getTileFromCoordinate(coordinate)

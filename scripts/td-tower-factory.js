@@ -31,7 +31,7 @@ export class CTowerFactory
                 TowerType.rocketTower,
                 {
                     'name':'Rocket Tower',
-                    'price':123,
+                    'price':10,
                     'layers': [
                         AssetType.rocketTowerBase,
                         AssetType.rocketTowerHead,

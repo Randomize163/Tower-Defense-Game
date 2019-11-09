@@ -52,12 +52,13 @@ class CGameBuildMenu
         this.hideBuildsMenu();
 
         this.buildOptionTemplateElement = document.getElementById("build-option-template");
-        this.buildOptionTemplateElement.style.display = 'none';
-
     }
 
     displayBuildsOptions(buildOptions)
     {
+        this.hideBuildsMenu();
+        this.clearBuildsOptions();
+        
         buildOptions.forEach( (option) => {
             const newElement = this.buildOptionTemplateElement.cloneNode(true);
             newElement.removeAttribute('id');
@@ -78,6 +79,12 @@ class CGameBuildMenu
     {
         const asset = this.assets.getAsset(assetType);
         ctx.drawImage(asset.image, asset.sx, asset.sy, asset.sWidth, asset.sHeight, 0, 0, width, height);
+    }
+
+    clearBuildsOptions()
+    {
+        // remove all children
+        this.gameBuildsMenu.innerHTML = '';
     }
 
     hideBuildsMenu()
@@ -240,6 +247,7 @@ class GameManager
         const coordinate = this.getMouseCoordinateOnCanvas(event);
         if (!this.display.coordinateIsOnPicture(coordinate[0], coordinate[1]))
         {
+            this.buildMenu.hideBuildsMenu();
             return;
         }
 
@@ -260,6 +268,10 @@ class GameManager
                 },
             ];
             this.buildMenu.displayBuildsOptions(buildOptions);
+        }
+        else
+        {
+            this.buildMenu.hideBuildsMenu();
         }
         
     }

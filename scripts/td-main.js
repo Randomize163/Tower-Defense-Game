@@ -2,6 +2,7 @@ import { assert } from './td-utils.js'
 import { Camera, Display } from './td-camera.js';
 import { CRandomLevel } from './td-level-random.js';
 import { AssetType, CKenneyAssetsCollection } from './td-asset.js';
+import { TowerType, CTowerFactory } from './td-tower-factory.js';
 
 const ScreenState = Object.freeze(
 {
@@ -54,19 +55,29 @@ class CGameBuildMenu
         this.buildOptionTemplateElement = document.getElementById("build-option-template");
     }
 
-    displayBuildsOptions(buildOptions)
+    displayBuildsOptions(buildOptions, tileX, tileY)
     {
         this.hideBuildsMenu();
         this.clearBuildsOptions();
         
-        buildOptions.forEach( (option) => {
+
+        buildOptions.forEach( (buildDescription, buildType) => {
             const newElement = this.buildOptionTemplateElement.cloneNode(true);
+            
             newElement.removeAttribute('id');
+            
             const canvas = newElement.querySelector('.build-option-canvas');
             const ctx = canvas.getContext('2d');
-            option.layers.forEach( (assetType) => {
+            buildDescription.layers.forEach( (assetType) => {
                 this.displayBuildPicture(ctx, canvas.width, canvas.height, assetType);
             });
+
+            newElement.querySelector('.build-option-name').innerHTML = buildDescription.name;
+            newElement.querySelector('.build-coins-value').innerHTML = buildDescription.price;
+
+            newElement.onclick = () => {
+                gameManager.onBuildTowerClick(buildDescription, buildType, tileX, tileY);
+            };
 
             newElement.style.display = 'block';
             this.gameBuildsMenu.appendChild(newElement);
@@ -163,8 +174,11 @@ class GameManager
     async beginGame(gameParams)
     {
         this.level = new CRandomLevel(gameParams.levelParams);
+        
         this.hp = gameParams.startHp;
         this.coins = gameParams.startCoins;
+        
+        this.towerFactory = new CTowerFactory();
         this.towersMap = Array.from(Array(this.level.width), () => new Array(this.level.height));
         this.towers = [];
 
@@ -179,7 +193,12 @@ class GameManager
     gameLoop(timeDelta)
     {
         this.display.clear();
+        
         this.level.display(this.display);
+        this.towers.forEach((tower) => {
+            tower.display(this.display);
+        });
+
         this.header.updateCoins(this.coins);
         this.header.updateHp(this.hp);
     }
@@ -257,23 +276,31 @@ class GameManager
 
         if (this.level.isPossibleToBuildOnTile(tileX, tileY) && !this.towersMap[tileX][tileY])
         {
-            const buildOptions = [
-                {
-                    'description':'Rocket Tower',
-                    'cost':100,
-                    'layers': [
-                        AssetType.rocketTowerBase,
-                        AssetType.rocketTowerHead,
-                    ],
-                },
-            ];
-            this.buildMenu.displayBuildsOptions(buildOptions);
+            const buildOptions = this.towerFactory.getBuildTowerOptions();
+            this.buildMenu.displayBuildsOptions(buildOptions, tileX, tileY);
         }
         else
         {
             this.buildMenu.hideBuildsMenu();
+        }   
+    }
+
+    onBuildTowerClick(buildDescription, buildType, tileX, tileY)
+    {
+        if (this.coins < buildDescription.price)
+        {
+            return;
         }
-        
+
+        const tower = this.towerFactory.createTower(buildType);
+        tower.setPlace(tileX, tileY);
+
+        this.towers.push(tower);
+        this.towersMap[tileX][tileY] = tower;
+
+        this.coins -= buildDescription.price;
+
+        this.buildMenu.hideBuildsMenu();
     }
 }
 
@@ -341,26 +368,3 @@ function initializeCallbacks()
 }
 
 initialize();
-
-// displayBuildsOptions test
-/*const buildOptions = [
-    {
-        'description':'Rocket Tower',
-        'cost':100,
-        'layers': [
-            AssetType.rocketTowerBase,
-            AssetType.rocketTowerHead,
-        ],
-    },
-    {
-        'description':'Rocket Tower',
-        'cost':100,
-        'layers': [
-            AssetType.rocketTowerBase,
-            AssetType.rocketTowerHead,
-        ],
-    },
-];
-
-this.buildMenu.displayBuildsOptions(buildOptions);
-*/

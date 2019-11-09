@@ -1,24 +1,11 @@
 import { IGameObject } from "./td-gameobject.js";
 import { AssetType } from "./td-asset.js";
 import { CTargetSelectNoSort } from "./td-target-select-algorithm.js";
-import { distance } from "./td-utils.js";
-
-export const UpgradeOptions = Object.freeze(
-{
-    "damage": 0,
-    "range": 1,
-    "reloadTime": 2,
-    "rocketSpeed": 3,
-});
+import { distance, assert } from "./td-utils.js";
+import { UpgradeOptions } from "./td-tower-factory.js"
  
 export class ITower extends IGameObject
 {
-    tileX;
-    tileY;
-    cost;
-    aimAlgorithm;
-    upgradeOptions;
-
     //
     // upgradeOptions = {{upgradeType, cost, currentLevel, maxLevel}}
     //
@@ -107,71 +94,27 @@ export class CBullet extends IGameObject
         this.destroyed = true;
     }
 
-    display(ctx, assets, camera)
+    display(display)
     {
         if (this.destroyed) {
             return;
         }
 
-        const asset = assets.getAsset(this.assetType);
-        ctx.save();
-        ctx.translate(this.tilesX * camera.tileSize, this.tilesY * camera.tileSize);
-        ctx.rotate(this.rotation);
-        ctx.drawImage(asset.image, asset.sx, asset.sy, asset.sWidth, asset.sHeight, -camera.tileSize/2, -camera.tileSize/2, camera.tileSize, camera.tileSize);  
-        ctx.restore();
+        display.drawImage(this.assetType, this.tilesX, this.tilesY, this.rotation);  
     }
 }
 
 export class CRocketTower extends ITower
 {
-    constructor(tilesX, tilesY, aimAlgo)
+    constructor(upgradeOptionsMap)
     {
         super();
-        this.tilesX = tilesX;
-        this.tilesY = tilesY;
         this.rotate = 0;
 
-        this.aimAlgorithm = aimAlgo;
+        this.aimAlgorithm = new CTargetSelectNoSort();
         this.rockets = [];
 
-        this.upgradeOptions = new Map([
-            [
-                UpgradeOptions.damage, 
-                {
-                    "cost": 50,
-                    "currentLevel": 0,
-                    "maxLevel": 5,
-                    "currentValue": 20,
-                }
-            ],
-            [
-                UpgradeOptions.range, 
-                {
-                    "cost": 50,
-                    "currentLevel": 0,
-                    "maxLevel": 5,
-                    "currentValue": 3,
-                }
-            ],
-            [
-                UpgradeOptions.reloadTime, 
-                {
-                    "cost": 50,
-                    "currentLevel": 0,
-                    "maxLevel": 5,
-                    "currentValue": 500,
-                } 
-            ],
-            [
-                UpgradeOptions.rocketSpeed, 
-                {
-                    "cost": 50,
-                    "currentLevel": 0,
-                    "maxLevel": 5,
-                    "currentValue": 0.005,
-                } 
-            ],
-        ]);
+        this.upgradeOptions = upgradeOptionsMap;
         
         this.currentTarget = null;
         this.reloadTimeLeft = this.reloadTime;
@@ -192,6 +135,17 @@ export class CRocketTower extends ITower
     get reloadTime()
     {
         return this.upgradeOptions.get(UpgradeOptions.reloadTime).currentValue;
+    }
+
+    setPlace(tilesX, tilesY)
+    {
+        this.tilesX = tilesX;
+        this.tilesY = tilesY;
+    }
+
+    setAimAlgorithm(algo)
+    {
+        this.aimAlgorithm = algo;
     }
 
     calculate(deltaTime, enemies) {   
@@ -247,36 +201,10 @@ export class CRocketTower extends ITower
 
     upgrade() {}
 
-    display(ctx, assets, camera) 
+    display(display) 
     {
-        this.displayBase(ctx, assets, camera);
-        this.displayHead(ctx, assets, camera);
-        this.displayRockets(ctx, assets, camera);
-    }
-
-    displayBase(ctx, assets, camera)
-    {
-        const x = this.tilesX * camera.tileSize - camera.offsetX;
-        const y = this.tilesY * camera.tileSize - camera.offsetY;
-
-        const asset = assets.getAsset(AssetType.rocketTowerBase);
-        ctx.drawImage(asset.image, asset.sx, asset.sy, asset.sWidth, asset.sHeight, x, y, camera.tileSize, camera.tileSize);  
-    }
-
-    displayHead(ctx, assets, camera)
-    {
-        const x = (this.tilesX + 0.5) * camera.tileSize - camera.offsetX;
-        const y = (this.tilesY + 0.5) * camera.tileSize - camera.offsetY;
-
-        const asset = assets.getAsset(AssetType.rocketTowerHead);
-        ctx.save();
-        ctx.translate(x, y);
-        ctx.rotate(this.rotation);
-        ctx.drawImage(asset.image, asset.sx, asset.sy, asset.sWidth, asset.sHeight, -camera.tileSize/2, -camera.tileSize/2, camera.tileSize, camera.tileSize);  
-        ctx.restore();
-    }
-
-    displayRockets(ctx, assets, camera) {
-        this.rockets.forEach(rocket => rocket.display(ctx, assets, camera));
+        display.drawImage(AssetType.rocketTowerBase, this.tilesX, this.tilesY);  
+        display.drawImage(AssetType.rocketTowerHead, this.tilesX, this.tilesY);  
+        this.rockets.forEach(rocket => rocket.display(display));
     }
 }

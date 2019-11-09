@@ -150,6 +150,15 @@ p3 {
     vertical-align: middle;
 }
 
+#game-right-footer {
+    background-color: rgba(82, 81, 81, 0.28);
+    position: absolute;
+    bottom: 0px;
+    right: 0px;
+    border-radius: 6px 6px 0px 6px;
+    padding: 2px;
+}
+
 .build-option {
     text-align: center;
     border: 2px solid rgba(82, 81, 81, 0.9);
@@ -175,21 +184,14 @@ p3 {
     vertical-align: middle;
 }
 
-#fullscreen-icon {
+.game-control {
     fill: white;
     width: 40px;
     height: 40px;
     filter: drop-shadow(2px 3px 0px #aaa);
 }
 
-#center-focus {
-    fill: white;
-    filter: drop-shadow(2px 3px 0px #aaa);
-    width: 40px;
-    height: 40px;
-}
-
-#center-focus:hover {
+.game-control:hover {
     fill: #ce2514;
     cursor: pointer;
 }

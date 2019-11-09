@@ -10,6 +10,43 @@ const ScreenState = Object.freeze(
     "minimized":1,
 });
 
+const GameState = Object.freeze(
+{
+    "notStarted":0,
+    "running":1,
+    "paused":2,
+    "finished":3,
+});
+    
+class CGameFooter
+{
+    constructor(pauseElement, playSpeedElement) 
+    {
+        this.pauseElement = pauseElement;
+        this.playSpeedElement = playSpeedElement;
+    }
+
+    hidePauseButton()
+    {
+        this.pauseElement.style.display = 'none';
+    }
+
+    showPauseButton()
+    {
+        this.pauseElement.style.display = 'block';
+    }
+
+    showFastPlayButton()
+    {
+        this.playSpeedElement.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', "#fast-forward");
+    }
+
+    showPlayButton()
+    {
+        this.playSpeedElement.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', "#play-button");
+    }
+}
+
 class CGameHeader
 {
     constructor(coinsElement, hpElement, fullscreenElement)
@@ -119,6 +156,7 @@ class GameManager
         this.borderSize = this.fullscreenElement.style.borderWidth;
 
         this.header = new CGameHeader(document.getElementById("coins-value"), document.getElementById("hp-value"), document.getElementById('fullscreen-hashtag'));
+        this.footer = new CGameFooter(document.getElementById("game-right-footer-pause-svg"), document.getElementById("game-right-footer-play-svg"));
 
         this.canvas = document.getElementById('game');
         this.ctx = this.canvas.getContext('2d');
@@ -182,11 +220,19 @@ class GameManager
         this.towersMap = Array.from(Array(this.level.width), () => new Array(this.level.height));
         this.towers = [];
 
+        this.enemies = [];
+
         this.assets = new CKenneyAssetsCollection();
         await this.assets.initialize();
         this.display = new Display(this.ctx, this.assets, this.canvasMinimizedWidth, this.canvasMinimizedHeight, this.level.width, this.level.height);
+        
         this.buildMenu = new CGameBuildMenu(this.assets);
         
+        this.footer.hidePauseButton();
+        this.footer.showPlayButton();
+        this.gameState = GameState.paused;
+        this.gameSpeed = 1;
+    
         this.startGameLoop();
     }
 
@@ -263,6 +309,11 @@ class GameManager
 
     onClick(event)
     {
+        if (this.gameState == GameState.paused)
+        {
+            return;
+        }
+
         const coordinate = this.getMouseCoordinateOnCanvas(event);
         if (!this.display.coordinateIsOnPicture(coordinate[0], coordinate[1]))
         {
@@ -301,6 +352,33 @@ class GameManager
         this.coins -= buildDescription.price;
 
         this.buildMenu.hideBuildsMenu();
+    }
+
+    onPauseClick()
+    {
+        this.gameState = GameState.paused;
+        this.footer.hidePauseButton();
+    }
+
+    onPlayClick()
+    {
+        if (this.gameState == GameState.running)
+        {
+            if (this.gameSpeed == 1)
+            {
+                this.gameSpeed = 2;
+                this.footer.showFastPlayButton();
+            }
+            else
+            {
+                assert(this.gameSpeed == 2)
+                this.gameSpeed = 1;
+                this.footer.showPlayButton();
+            }
+        }
+
+        this.gameState = GameState.running;
+        this.footer.showPauseButton();
     }
 }
 
@@ -365,6 +443,9 @@ function initializeCallbacks()
     document.addEventListener("mouseup", (event) => gameManager.onMouseUp(event));
     document.addEventListener("mousemove", (event) => gameManager.onMouseMove(event));
     gameElement.onclick = (event) => gameManager.onClick(event);
+
+    document.getElementById("game-right-footer-pause-svg").onclick = () => gameManager.onPauseClick();
+    document.getElementById("game-right-footer-play").onclick = () => gameManager.onPlayClick();
 }
 
 initialize();

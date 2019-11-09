@@ -7,6 +7,7 @@
   <body>
     <!---  SVG import   -->
     <svg xmlns="http://www.w3.org/2000/svg" style="display: none;"><symbol id="fullscreen" viewBox="0 0 298.667 298.667"><title>fullscreen</title><polygon points="42.667,192 0,192 0,298.667 106.667,298.667 106.667,256 42.667,256 "/><polygon points="0,106.667 42.667,106.667 42.667,42.667 106.667,42.667 106.667,0 0,0 "/><polygon points="192,0 192,42.667 256,42.667 256,106.667 298.667,106.667 298.667,0 "/><polygon points="256,256 192,256 192,298.667 298.667,298.667 298.667,192 256,192 "/></symbol><symbol id="exit-full-screen" viewBox="0 0 32 32"><title>exit-full-screen</title><polygon points="24.586,27.414 29.172,32 32,29.172 27.414,24.586 32,20 20,20 20,32 "/><polygon points="0,12 12,12 12,0 7.414,4.586 2.875,0.043 0.047,2.871 4.586,7.414 "/><polygon points="0,29.172 2.828,32 7.414,27.414 12,32 12,20 0,20 4.586,24.586 "/><polygon points="20,12 32,12 27.414,7.414 31.961,2.871 29.133,0.043 24.586,4.586 20,0 "/></symbol></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" style="display: none;"><symbol id="play-button" viewBox="0 0 41.999 41.999"><title>play-button</title><path d="M36.068,20.176l-29-20C6.761-0.035,6.363-0.057,6.035,0.114C5.706,0.287,5.5,0.627,5.5,0.999v40 c0,0.372,0.206,0.713,0.535,0.886c0.146,0.076,0.306,0.114,0.465,0.114c0.199,0,0.397-0.06,0.568-0.177l29-20 c0.271-0.187,0.432-0.494,0.432-0.823S36.338,20.363,36.068,20.176z M7.5,39.095V2.904l26.239,18.096L7.5,39.095z"/></symbol><symbol id="fast-forward" viewBox="0 0 57 57"><title>fast-forward</title><path d="M56.575,27.683l-27-19c-0.306-0.216-0.703-0.242-1.036-0.07C28.208,8.784,28,9.127,28,9.5v17.777L1.575,8.694 C1.27,8.481,0.872,8.453,0.539,8.625C0.208,8.797,0,9.14,0,9.513v37.975c0,0.373,0.208,0.716,0.539,0.888 C0.685,48.45,0.843,48.487,1,48.487c0.202,0,0.403-0.062,0.575-0.182L28,29.723V47.5c0,0.373,0.208,0.716,0.539,0.888 C28.685,48.463,28.843,48.5,29,48.5c0.202,0,0.404-0.062,0.575-0.183l27-19C56.842,29.131,57,28.825,57,28.5 S56.842,27.869,56.575,27.683z M2,45.562V11.439L26.262,28.5L2,45.562z M30,45.573V11.427L54.263,28.5L30,45.573z"/></symbol><symbol id="pause-button" viewBox="0 0 314 314"><title>pause-button</title><path d="M91.47,0H75.343C58.538,0,44.867,13.671,44.867,30.476v253.048c0,16.805,13.671,30.477,30.476,30.477H91.47 c16.805,0,30.477-13.672,30.477-30.477V30.476C121.946,13.671,108.274,0,91.47,0z M107.946,283.523 c0,9.085-7.392,16.477-16.477,16.477H75.343c-9.085,0-16.476-7.392-16.476-16.477V30.476C58.867,21.391,66.258,14,75.343,14H91.47 c9.085,0,16.477,7.391,16.477,16.476V283.523z"/><path d="M238.657,0H222.53c-16.805,0-30.477,13.671-30.477,30.476v253.048c0,16.805,13.672,30.477,30.477,30.477h16.127 c16.805,0,30.476-13.672,30.476-30.477V30.476C269.133,13.671,255.462,0,238.657,0z M255.133,283.523 c0,9.085-7.391,16.477-16.476,16.477H222.53c-9.085,0-16.477-7.392-16.477-16.477V30.476c0-9.085,7.392-16.476,16.477-16.476 h16.127c9.085,0,16.476,7.391,16.476,16.476V283.523z"/></symbol></svg>
     <link href="styles/style.css" rel="stylesheet">
     <div class="grid-container">
       <header id="grid-item-header">
@@ -31,8 +32,8 @@
             <p1 id="coins-value">100</p1>
           </div>
           <div class="header-output" id="fullscreen">
-            <svg xmlns="http://www.w3.org/2000/svg" id="center-focus" viewBox="0 0 24 24"><path d="M5 15H3v4c0 1.1.9 2 2 2h4v-2H5v-4zM5 5h4V3H5c-1.1 0-2 .9-2 2v4h2V5zm14-2h-4v2h4v4h2V5c0-1.1-.9-2-2-2zm0 16h-4v2h4c1.1 0 2-.9 2-2v-4h-2v4zM12 9c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
-            <svg id="fullscreen-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" id="center-focus" class="game-control" viewBox="0 0 24 24"><path d="M5 15H3v4c0 1.1.9 2 2 2h4v-2H5v-4zM5 5h4V3H5c-1.1 0-2 .9-2 2v4h2V5zm14-2h-4v2h4v4h2V5c0-1.1-.9-2-2-2zm0 16h-4v2h4c1.1 0 2-.9 2-2v-4h-2v4zM12 9c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+            <svg id="fullscreen-icon" class="game-control">
               <use xlink:href="#fullscreen" id="fullscreen-hashtag" />  <!--"#exit-full-screen" -->
             </svg>
           </div>
@@ -51,6 +52,15 @@
           </div>
         </div>
         <!-- build-option-template end -->
+
+        <div id="game-right-footer" class="flex-container">
+          <svg class="game-control" id="game-right-footer-pause-svg" >
+            <use xlink:href="#pause-button" /> 
+          </svg>
+          <svg class="game-control" id="game-right-footer-play">
+              <use xlink:href="#play-button" id="game-right-footer-play-svg" /> 
+          </svg>
+        </div>
       </div>
 
       <div id="grid-item-scoreboard">

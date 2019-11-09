@@ -1,7 +1,7 @@
 
 import { CRandomFloorLayer } from "./td-layer-floor.js";
 import { CRandomDecorationsLayer } from "./td-layer-decorations.js";
-import { CKenneyAssetsCollection } from "./td-asset.js";
+import { CKenneyAssetsCollection, AssetType } from "./td-asset.js";
 import { ILevel } from "./td-level.js";
 import { sleep } from "./td-utils.js";
 import { Camera } from "./td-camera.js";
@@ -25,6 +25,11 @@ export class CRandomLevel extends ILevel
     getPath()
     {
         return this.layers[0].path;
+    }
+
+    isPossibleToBuildOnTile(tileX, tileY)
+    {
+        return this.layers[0].tilesMap[tileX][tileY] == AssetType.towerTile;
     }
 
     getBegin()

@@ -192,13 +192,13 @@ export class Display
         }
     }
 
-    getTileFromCoordinates(coordinate)
+    getTileFromCoordinate(coordinate)
     {
         const [x, y] = coordinate;
         assert(this.coordinateIsOnPicture(x, y));
 
-        const tileX = (x - this.pictureWidth) / this.tileSize;
-        const tileY = (y - this.pictureHeight) / this.tileSize;
+        const tileX = (x - this.pictureOffsetX) / this.tileSize;
+        const tileY = (y - this.pictureOffsetY) / this.tileSize;
 
         return [tileX, tileY];
     }

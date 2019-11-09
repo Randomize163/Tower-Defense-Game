@@ -158,7 +158,9 @@ class GameManager
         this.level = new CRandomLevel(gameParams.levelParams);
         this.hp = gameParams.startHp;
         this.coins = gameParams.startCoins;
-        
+        this.towersMap = Array.from(Array(this.level.width), () => new Array(this.level.height));
+        this.towers = [];
+
         this.assets = new CKenneyAssetsCollection();
         await this.assets.initialize();
         this.display = new Display(this.ctx, this.assets, this.canvasMinimizedWidth, this.canvasMinimizedHeight, this.level.width, this.level.height);
@@ -196,7 +198,7 @@ class GameManager
     onWheel(event)
     {
         const tileSizeDelta = -event.deltaY * 0.05;
-        this.display.zoom(tileSizeDelta, this.mouseCoordinatesOnCanvas(event));
+        this.display.zoom(tileSizeDelta, this.getMouseCoordinateOnCanvas(event));
     }
 
     onMouseUp(event)
@@ -222,7 +224,7 @@ class GameManager
         }
     }
 
-    mouseCoordinatesOnCanvas(event)
+    getMouseCoordinateOnCanvas(event)
     {
         const rect = this.canvas.getBoundingClientRect();
         return [event.clientX - rect.left, event.clientY - rect.top];
@@ -235,7 +237,31 @@ class GameManager
 
     onClick(event)
     {
-        console.log(this.display.getTileFromCoordinates(this.mouseCoordinatesOnCanvas(event)));
+        const coordinate = this.getMouseCoordinateOnCanvas(event);
+        if (!this.display.coordinateIsOnPicture(coordinate[0], coordinate[1]))
+        {
+            return;
+        }
+
+        let [tileX, tileY] = this.display.getTileFromCoordinate(coordinate);
+        tileX = Math.floor(tileX);
+        tileY = Math.floor(tileY);
+
+        if (this.level.isPossibleToBuildOnTile(tileX, tileY) && !this.towersMap[tileX][tileY])
+        {
+            const buildOptions = [
+                {
+                    'description':'Rocket Tower',
+                    'cost':100,
+                    'layers': [
+                        AssetType.rocketTowerBase,
+                        AssetType.rocketTowerHead,
+                    ],
+                },
+            ];
+            this.buildMenu.displayBuildsOptions(buildOptions);
+        }
+        
     }
 }
 

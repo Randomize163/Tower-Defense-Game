@@ -223,7 +223,7 @@ class GameManager
         }
         
         setInterval(() => {
-            if (enemies.length > 0) {
+            if (enemies.length > 0 && this.gameState == GameState.running) {
                 this.enemies.push(enemies.pop());
             }
         },
@@ -420,13 +420,13 @@ class GameManager
             if (this.gameSpeed == 1)
             {
                 this.gameSpeed = 2;
-                this.footer.showFastPlayButton();
+                this.footer.showPlayButton();
             }
             else
             {
                 assert(this.gameSpeed == 2)
                 this.gameSpeed = 1;
-                this.footer.showPlayButton();
+                this.footer.showFastPlayButton();
             }
         }
     

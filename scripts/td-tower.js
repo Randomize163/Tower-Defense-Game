@@ -187,7 +187,7 @@ export class CRocketTower extends ITower
 
     shoot(enemy)
     {
-        const rocket = new CBullet(enemy, this.damage, this.rocketSpeed, this.rocketTimeToLive, this.tilesX + 0.5, this.tilesY + 0.5, AssetType.smallRocket);
+        const rocket = new CBullet(enemy, this.damage, this.rocketSpeed, this.rocketTimeToLive, this.tilesX + 0.5, this.tilesY + 0.5, AssetType.gunBullet);
         this.rockets.push(rocket);
     }
 
@@ -203,8 +203,8 @@ export class CRocketTower extends ITower
 
     display(display) 
     {
-        display.drawImage(AssetType.rocketTowerBase, this.tilesX, this.tilesY);  
-        display.drawImage(AssetType.rocketTowerHead, this.tilesX, this.tilesY, this.rotation);  
+        display.drawImage(AssetType.gunTowerBase, this.tilesX, this.tilesY);  
         this.rockets.forEach(rocket => rocket.display(display));
+        display.drawImage(AssetType.gunTowerHead, this.tilesX, this.tilesY, this.rotation);  
     }
 }

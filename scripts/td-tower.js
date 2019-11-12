@@ -104,11 +104,16 @@ export class CBullet extends IGameObject
     }
 }
 
-export class CRocketTower extends ITower
+export class CTower extends ITower
 {
-    constructor(upgradeOptionsMap)
+    constructor(upgradeOptionsMap, baseAsset, headAsset, bulletAsset)
     {
         super();
+
+        this.baseAsset = baseAsset;
+        this.headAsset = headAsset;
+        this.bulletAsset = bulletAsset;
+
         this.rotate = 0;
 
         this.aimAlgorithm = new CTargetSelectNoSort();
@@ -187,7 +192,7 @@ export class CRocketTower extends ITower
 
     shoot(enemy)
     {
-        const rocket = new CBullet(enemy, this.damage, this.rocketSpeed, this.rocketTimeToLive, this.tilesX + 0.5, this.tilesY + 0.5, AssetType.gunBullet);
+        const rocket = new CBullet(enemy, this.damage, this.rocketSpeed, this.rocketTimeToLive, this.tilesX + 0.5, this.tilesY + 0.5, this.bulletAsset);
         this.rockets.push(rocket);
     }
 
@@ -203,8 +208,8 @@ export class CRocketTower extends ITower
 
     display(display) 
     {
-        display.drawImage(AssetType.gunTowerBase, this.tilesX, this.tilesY);  
+        display.drawImage(this.baseAsset, this.tilesX, this.tilesY);  
         this.rockets.forEach(rocket => rocket.display(display));
-        display.drawImage(AssetType.gunTowerHead, this.tilesX, this.tilesY, this.rotation);  
+        display.drawImage(this.headAsset, this.tilesX, this.tilesY, this.rotation);  
     }
 }

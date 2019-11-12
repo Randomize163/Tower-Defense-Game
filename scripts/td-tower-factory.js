@@ -1,9 +1,10 @@
 import { AssetType } from './td-asset.js' 
-import { CRocketTower } from './td-tower.js'
+import { CTower } from './td-tower.js'
 
 export const TowerType = Object.freeze(
 {
     "rocketTower":0,
+    "gunTower":1
 });
 
 export const UpgradeOptions = Object.freeze(
@@ -26,15 +27,29 @@ export class CTowerFactory
     constructor()
     {
         this.rocketTowerUpgradeOptionsMap = this.getRocketTowerUpgradeOptionsMap();
+        this.gunTowerUpgradeOptionsMap = this.getGunTowerUpgradeOptionsMap();
         this.buildTowerOptions = new Map([
+            [
+                TowerType.gunTower,
+                {
+                    'name':'Gun Tower',
+                    'price':10,
+                    'layers': [
+                        AssetType.gunTowerBase,
+                        AssetType.gunTowerHead,
+                    ],
+                    'type':TowerType.gunBullet,
+                    'upgradeOptionsMap': this.getGunTowerUpgradeOptionsMap,             
+                },
+            ],
             [
                 TowerType.rocketTower,
                 {
                     'name':'Rocket Tower',
-                    'price':10,
+                    'price':20,
                     'layers': [
                         AssetType.rocketTowerBase,
-                        AssetType.rocketTowerHead,
+                        AssetType.rocketTowerHeadOneRocket,
                     ],
                     'type':TowerType.rocketTower,
                     'upgradeOptionsMap': this.rocketTowerUpgradeOptionsMap,             
@@ -52,7 +67,49 @@ export class CTowerFactory
                     "cost": 50,
                     "currentLevel": 0,
                     "maxLevel": 5,
-                    "currentValue": 20,
+                    "currentValue": 50,
+                }
+            ],
+            [
+                UpgradeOptions.range, 
+                {
+                    "cost": 50,
+                    "currentLevel": 0,
+                    "maxLevel": 5,
+                    "currentValue": 5,
+                }
+            ],
+            [
+                UpgradeOptions.reloadTime, 
+                {
+                    "cost": 50,
+                    "currentLevel": 0,
+                    "maxLevel": 5,
+                    "currentValue": 1000,
+                } 
+            ],
+            [
+                UpgradeOptions.rocketSpeed, 
+                {
+                    "cost": 50,
+                    "currentLevel": 0,
+                    "maxLevel": 5,
+                    "currentValue": 0.005,
+                } 
+            ],
+        ]);
+    }
+
+    getGunTowerUpgradeOptionsMap()
+    {
+        return new Map([
+            [
+                UpgradeOptions.damage, 
+                {
+                    "cost": 50,
+                    "currentLevel": 0,
+                    "maxLevel": 5,
+                    "currentValue": 10,
                 }
             ],
             [
@@ -70,7 +127,7 @@ export class CTowerFactory
                     "cost": 50,
                     "currentLevel": 0,
                     "maxLevel": 5,
-                    "currentValue": 500,
+                    "currentValue": 300,
                 } 
             ],
             [
@@ -79,7 +136,7 @@ export class CTowerFactory
                     "cost": 50,
                     "currentLevel": 0,
                     "maxLevel": 5,
-                    "currentValue": 0.005,
+                    "currentValue": 0.03,
                 } 
             ],
         ]);
@@ -94,7 +151,9 @@ export class CTowerFactory
         switch (towerType)
         {
             case TowerType.rocketTower:
-                return new CRocketTower(this.getRocketTowerUpgradeOptionsMap());
+                return new CTower(this.getRocketTowerUpgradeOptionsMap(), AssetType.rocketTowerBase, AssetType.rocketTowerHeadOneRocket, AssetType.smallRocket);
+            case TowerType.gunTower:
+                return new CTower(this.getGunTowerUpgradeOptionsMap(), AssetType.gunTowerBase, AssetType.gunTowerHead, AssetType.gunBullet);
             default:
                 console.error("Unknown Tower Type");
                 debugger;

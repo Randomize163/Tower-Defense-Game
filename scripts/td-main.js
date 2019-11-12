@@ -283,8 +283,16 @@ class GameManager
 
         if (this.hp == 0)
         {
-            // Game Over
+            this.gameOver();
         }
+    }
+
+    gameOver()
+    {
+        this.gameState = GameState.finished;
+        this.footer.hidePauseButton();
+        this.footer.showPlayButton();
+        document.getElementById("game-right-footer-play").onclick = () => window.location.reload();
     }
 
     gameLoop(timeDelta)
@@ -475,6 +483,9 @@ class GameManager
                 break;
             case GameState.running:
                 text = this.getLevelStatus();
+                break;
+            case GameState.finished:  
+                text = "Game Over! You've got to " + this.getLevelStatus();
                 break;
             default:
                 text = '';

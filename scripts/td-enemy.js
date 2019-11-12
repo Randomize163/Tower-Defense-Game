@@ -74,12 +74,6 @@ export class CEnemy extends IGameObject
             return;
         }
 
-        if (this.finishedPath)
-        {
-            this.destroy();
-            return;
-        }
-
         let {x, y, rotation} = this.getNextPosition(deltaTime);
         this.tilesX = x;
         this.tilesY = y;
@@ -94,6 +88,7 @@ export class CEnemy extends IGameObject
         if (this.nextPathPointIndex == this.path.length)
         {
             this.finishedPath = true;
+            this.destroyed = true;
             console.log("Enemy finished path");
         }
     }

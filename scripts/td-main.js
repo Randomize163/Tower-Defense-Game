@@ -4,7 +4,8 @@ import { CRandomLevel } from './td-level-random.js';
 import { AssetType, CKenneyAssetsCollection } from './td-asset.js';
 import { TowerType, CTowerFactory } from './td-tower-factory.js';
 import { CEnemy } from './td-enemy.js';
-
+import { CEnemyAttack, generateWaveDescription } from './td-enemy-attack.js'
+ 
 const ScreenState = Object.freeze(
 {
     "fullscreen":0,
@@ -224,21 +225,7 @@ class GameManager
 
     startGame()
     {
-        const [beginX, beginY] = this.level.getBegin();
-        const enemies = [];
-        for (let i = 0; i < 100; i++)
-        {
-            const enemy = new CEnemy(beginX + Math.random(), beginY + Math.random() , 0, 0.002, 100, 100, 0.1, AssetType.enemyBasic);
-            enemy.setPath(this.level.getPath());
-            enemies.push(enemy);
-        }
-        
-        setInterval(() => {
-            if (enemies.length > 0 && this.gameState == GameState.running) {
-                this.enemies.push(enemies.pop());
-            }
-        },
-        300);
+        this.enemyAttack = new CEnemyAttack(this, generateWaveDescription());
     }
 
     async beginGame(gameParams)
@@ -271,17 +258,33 @@ class GameManager
 
     calculateObjects(timeDelta)
     {
+        this.enemyAttack.calculate(timeDelta);
         this.towers.forEach((tower) => tower.calculate(timeDelta, this.enemies));
 
         const lifeEnemies = [];
         this.enemies.forEach((enemy) => {
             enemy.calculate(timeDelta);
-            if (!enemy.destroyed)
+            if (enemy.finishedPath) this.hit();
+            if (!enemy.destroyed) lifeEnemies.push(enemy);
+            if (enemy.destroyed && !enemy.finishedPath) 
             {
-                lifeEnemies.push(enemy);
+                this.coins += enemy.killBonus;
             }
         });
         this.enemies = lifeEnemies;
+        
+        if (this.enemies.length == 0) this.enemyAttack.beginNextWave();
+    }
+
+    hit(damage = 1)
+    {
+        this.hp = Math.max(this.hp - damage, 0);
+        console.log(this.hp);
+
+        if (this.hp == 0)
+        {
+            // Game Over
+        }
     }
 
     gameLoop(timeDelta)
@@ -299,6 +302,7 @@ class GameManager
 
         this.header.updateCoins(this.coins);
         this.header.updateHp(this.hp);
+        this.printGameStatusToHeader();
     }
 
     static gameLoopHelper(timestamp)
@@ -308,6 +312,16 @@ class GameManager
         gameManager.gameLoop(timeDelta * gameManager.gameSpeed);
         gameManager.loopCancelationId = window.requestAnimationFrame(GameManager.gameLoopHelper);
         gameManager.lastTimeStamp = timestamp;
+    }
+
+    addEnemy(type, hp, speed, killBonus)
+    {      
+        const [beginX, beginY] = this.level.getBegin();
+        const enemy = new CEnemy(beginX + Math.random(), beginY + Math.random(), 0, speed, hp, killBonus, 0.1, type);
+        enemy.setPath(this.level.getPath());
+        this.enemies.push(enemy);
+
+        this.printGameStatusToHeader();
     }
 
     startGameLoop()
@@ -472,7 +486,7 @@ class GameManager
 
     getLevelStatus()
     {
-        return 'Wave 1';
+        return this.enemyAttack.getCurrentWaveDescription().name;
     }
 }
 
@@ -483,7 +497,7 @@ function initialize()
 
     const gameParams = {
         'startHp':100,
-        'startCoins':1000,
+        'startCoins':200,
         'initialTileSize':74,
         'levelParams': {
             'width':5,

@@ -33,7 +33,7 @@ export class CTowerFactory
                 TowerType.gunTower,
                 {
                     'name':'Gun Tower',
-                    'price':10,
+                    'price':50,
                     'layers': [
                         AssetType.gunTowerBase,
                         AssetType.gunTowerHead,
@@ -46,7 +46,7 @@ export class CTowerFactory
                 TowerType.rocketTower,
                 {
                     'name':'Rocket Tower',
-                    'price':20,
+                    'price':100,
                     'layers': [
                         AssetType.rocketTowerBase,
                         AssetType.rocketTowerHeadOneRocket,
@@ -67,7 +67,7 @@ export class CTowerFactory
                     "cost": 50,
                     "currentLevel": 0,
                     "maxLevel": 5,
-                    "currentValue": 50,
+                    "currentValue": 10,
                 }
             ],
             [
@@ -109,7 +109,7 @@ export class CTowerFactory
                     "cost": 50,
                     "currentLevel": 0,
                     "maxLevel": 5,
-                    "currentValue": 10,
+                    "currentValue": 5,
                 }
             ],
             [

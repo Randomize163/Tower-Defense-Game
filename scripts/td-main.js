@@ -50,11 +50,12 @@ class CGameFooter
 
 class CGameHeader
 {
-    constructor(coinsElement, hpElement, fullscreenElement)
+    constructor(coinsElement, hpElement, textElement, fullscreenElement)
     {
         this.coinsElement = coinsElement;
         this.hpElement = hpElement;
         this.fullscreenElement = fullscreenElement;
+        this.textElement = textElement;
     }
 
     updateHp(hp) 
@@ -78,6 +79,11 @@ class CGameHeader
             assert(state == ScreenState.fullscreen);
             this.fullscreenElement.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', "#exit-full-screen");
         }
+    }
+
+    showText(text)
+    {
+        this.textElement.innerHTML = text;
     }
 }
 
@@ -156,7 +162,12 @@ class GameManager
         this.fullscreenElement = document.getElementById('grid-item-game');
         this.borderSize = this.fullscreenElement.style.borderWidth;
 
-        this.header = new CGameHeader(document.getElementById("coins-value"), document.getElementById("hp-value"), document.getElementById('fullscreen-hashtag'));
+        this.header = new CGameHeader(
+            document.getElementById("coins-value"), 
+            document.getElementById("hp-value"), 
+            document.getElementById('header-game-text'), 
+            document.getElementById('fullscreen-hashtag')
+        );
         this.footer = new CGameFooter(document.getElementById("game-right-footer-pause-svg"), document.getElementById("game-right-footer-play-svg"));
 
         this.canvas = document.getElementById('game');
@@ -253,6 +264,7 @@ class GameManager
         this.footer.showPlayButton();
         this.gameState = GameState.notStarted;
         this.gameSpeed = 1;
+        this.printGameStatusToHeader();
     
         this.startGameLoop();
     }
@@ -404,6 +416,7 @@ class GameManager
     {
         this.gameState = GameState.paused;
         this.footer.hidePauseButton();
+        this.printGameStatusToHeader();
     }
 
     onPlayClick()
@@ -432,6 +445,34 @@ class GameManager
     
         this.gameState = GameState.running;
         this.footer.showPauseButton();
+        this.printGameStatusToHeader();
+    }
+
+    printGameStatusToHeader()
+    {
+        let text = "";
+        switch (this.gameState)
+        {
+            case GameState.notStarted:
+                text = "Press Play to Begin";
+                break;
+            case GameState.paused:
+                text = "Press Play To Continue";
+                break;
+            case GameState.running:
+                text = this.getLevelStatus();
+                break;
+            default:
+                text = '';
+                break;
+        }
+
+        this.header.showText(text);
+    }
+
+    getLevelStatus()
+    {
+        return 'Wave 1';
     }
 }
 

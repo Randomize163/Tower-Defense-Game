@@ -101,9 +101,6 @@ export class Display
     {
         const [mouseX, mouseY] = mouseCoordinatesOnCanvas;
 
-        this.ctx.fillStyle = 'rgba(255, 0, 0, 1)';
-        this.ctx.fillRect(mouseX, mouseY, 10, 10);
-
         assert(0 <= mouseX && mouseX <= this.width);
         assert(0 <= mouseY && mouseY <= this.height);
         

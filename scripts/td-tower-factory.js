@@ -39,7 +39,7 @@ export class CTowerFactory
                         AssetType.gunTowerHead,
                     ],
                     'type':TowerType.gunBullet,
-                    'upgradeOptionsMap': this.getGunTowerUpgradeOptionsMap,             
+                    'upgradeOptionsMap': this.gunTowerUpgradeOptionsMap,             
                 },
             ],
             [

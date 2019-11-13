@@ -2,7 +2,7 @@ import { assert } from './td-utils.js'
 import { Camera, Display } from './td-camera.js';
 import { CRandomLevel } from './td-level-random.js';
 import { AssetType, CKenneyAssetsCollection } from './td-asset.js';
-import { TowerType, CTowerFactory } from './td-tower-factory.js';
+import { TowerType, CTowerFactory, UpgradeOptions } from './td-tower-factory.js';
 import { CEnemy } from './td-enemy.js';
 import { CEnemyAttack, generateWaveDescription } from './td-enemy-attack.js'
  
@@ -119,6 +119,10 @@ class CGameBuildMenu
 
             newElement.querySelector('.build-option-name').innerHTML = buildDescription.name;
             newElement.querySelector('.build-coins-value').innerHTML = buildDescription.price;
+
+            newElement.querySelector('.build-option-damage').innerHTML += buildDescription.upgradeOptionsMap.get(UpgradeOptions.damage).currentValue;
+            newElement.querySelector('.build-option-range').innerHTML += buildDescription.upgradeOptionsMap.get(UpgradeOptions.range).currentValue;
+            newElement.querySelector('.build-option-reload-speed').innerHTML += buildDescription.upgradeOptionsMap.get(UpgradeOptions.reloadTime).currentValue;
 
             newElement.onclick = () => {
                 gameManager.onBuildTowerClick(buildDescription, buildType, tileX, tileY);
@@ -452,7 +456,7 @@ class GameManager
         else
         if (this.gameState == GameState.running)
         {
-            if (this.gameSpeed == 1)
+            /*if (this.gameSpeed == 1)
             {
                 this.gameSpeed = 2;
                 this.footer.showPlayButton();
@@ -462,7 +466,11 @@ class GameManager
                 assert(this.gameSpeed == 2)
                 this.gameSpeed = 1;
                 this.footer.showFastPlayButton();
-            }
+            }*/
+            this.gameSpeed += 1;
+            if (this.gameSpeed == 5) this.gameSpeed = 1;
+
+            this.footer.showFastPlayButton();
         }
     
         this.gameState = GameState.running;

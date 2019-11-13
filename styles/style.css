@@ -72,6 +72,13 @@ p2, p3 {
     text-shadow: 0 1px 0 #ccc;
 }
 
+p4  {
+    font: bold 20px/1 "Helvetica Neue", Helvetica, Arial, sans-serif;
+    color: #fff;
+    text-align: center;
+    text-shadow: 0 2px 0 rgb(107, 102, 102);
+}
+
 h1 {
    font-size: 90px;
 }
@@ -210,4 +217,8 @@ p3 {
 
 #header-game-text {
     color: rgb(48, 36, 23);
+}
+
+.block {
+    display: block;
 }

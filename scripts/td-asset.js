@@ -69,7 +69,7 @@ export class CKenneyAssetsCollection extends IAssetCollection
 {
     constructor()
     {
-        super('kenney', '../images/tower-defense-tilesheet-kenney.png');
+        super('kenney', 'images/tower-defense-tilesheet-kenney.png');
         this.sTileWidth = 128;
         this.sTileHeight = 128;
     }

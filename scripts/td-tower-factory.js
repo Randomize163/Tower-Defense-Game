@@ -1,5 +1,6 @@
-import { AssetType } from './td-asset.js' 
-import { CTower } from './td-tower.js'
+import { AssetType } from './td-asset.js';
+import { CTower } from './td-tower.js';
+import { getSquareSequenceWithParams } from './td-utils.js';
 
 export const TowerType = Object.freeze(
 {
@@ -15,11 +16,60 @@ export const UpgradeOptions = Object.freeze(
         "rocketSpeed": 3,
     });
 
+export function upgradeOptionToString(upgradeOption)
+{
+    switch (upgradeOption) 
+    {
+        case UpgradeOptions.damage:
+            return "Damage";
+        case UpgradeOptions.range:
+            return "Range";
+        case UpgradeOptions.reloadTime:
+            return "Reload Time";
+        case UpgradeOptions.rocketSpeed:
+            return "Bullet Speed";         
+        default:
+            debugger;
+    }
+}
+
+export function upgradeOptionIconPath(upgradeOption)
+{
+    switch (upgradeOption) 
+    {
+        case UpgradeOptions.damage:
+            return "/images/upgrades/damage.png";
+        case UpgradeOptions.range:
+            return "/images/upgrades/range.png";
+        case UpgradeOptions.reloadTime:
+            return "/images/upgrades/reload-time.png";
+        case UpgradeOptions.rocketSpeed:
+            return "/images/upgrades/bullet-speed.png";         
+        default:
+            debugger;
+    }
+}
+
+export function getOptionCost(option)
+{
+    return option.costFunction(option.currentLevel);
+}
+
+export function getOptionValue(option)
+{
+    return option.valueFunction(option.currentLevel);
+}
+
 class ITowerFactory
 {
     getBuildTowerOptions() {}
 
     createTower(towerType, towerParams = null) {}
+}
+
+function getDefaultCostFunction()
+{
+    return getSquareSequenceWithParams(500, 500, 500);
 }
 
 export class CTowerFactory
@@ -64,37 +114,37 @@ export class CTowerFactory
             [
                 UpgradeOptions.damage, 
                 {
-                    "cost": 50,
                     "currentLevel": 0,
                     "maxLevel": 5,
-                    "currentValue": 10,
+                    "costFunction": getDefaultCostFunction(),
+                    "valueFunction": getSquareSequenceWithParams(10, 15, 0),
                 }
             ],
             [
                 UpgradeOptions.range, 
                 {
-                    "cost": 50,
                     "currentLevel": 0,
                     "maxLevel": 5,
-                    "currentValue": 5,
+                    "costFunction": getDefaultCostFunction(),
+                    "valueFunction": getSquareSequenceWithParams(5, 0.5, 0),
                 }
             ],
             [
                 UpgradeOptions.reloadTime, 
                 {
-                    "cost": 50,
                     "currentLevel": 0,
                     "maxLevel": 5,
-                    "currentValue": 1000,
+                    "costFunction": getDefaultCostFunction(),
+                    "valueFunction": getSquareSequenceWithParams(1000, -100, 0),
                 } 
             ],
             [
                 UpgradeOptions.rocketSpeed, 
                 {
-                    "cost": 50,
                     "currentLevel": 0,
                     "maxLevel": 5,
-                    "currentValue": 0.005,
+                    "costFunction": getDefaultCostFunction(),
+                    "valueFunction": getSquareSequenceWithParams(0.005, 0.002, 0),
                 } 
             ],
         ]);
@@ -106,37 +156,37 @@ export class CTowerFactory
             [
                 UpgradeOptions.damage, 
                 {
-                    "cost": 50,
                     "currentLevel": 0,
                     "maxLevel": 5,
-                    "currentValue": 5,
+                    "costFunction": getDefaultCostFunction(),
+                    "valueFunction": getSquareSequenceWithParams(5, 10, 0),
                 }
             ],
             [
                 UpgradeOptions.range, 
                 {
-                    "cost": 50,
                     "currentLevel": 0,
                     "maxLevel": 5,
-                    "currentValue": 3,
+                    "costFunction": getDefaultCostFunction(),
+                    "valueFunction": getSquareSequenceWithParams(3, 0.5, 0),
                 }
             ],
             [
                 UpgradeOptions.reloadTime, 
                 {
-                    "cost": 50,
                     "currentLevel": 0,
                     "maxLevel": 5,
-                    "currentValue": 300,
+                    "costFunction": getDefaultCostFunction(),
+                    "valueFunction": getSquareSequenceWithParams(300, -50, 0),
                 } 
             ],
             [
                 UpgradeOptions.rocketSpeed, 
                 {
-                    "cost": 50,
                     "currentLevel": 0,
                     "maxLevel": 5,
-                    "currentValue": 0.03,
+                    "costFunction": getDefaultCostFunction(),
+                    "valueFunction": getSquareSequenceWithParams(0.03, 0.005, 0),
                 } 
             ],
         ]);

@@ -93,6 +93,25 @@ export function equalsFloats(first, second, precision = 0.000001)
     return Math.abs(first - second) < precision;
 }
 
+export function getSquareSequenceWithParams(x0, v, a)
+{
+    let f = (index) => {
+        return x0 + v * index + a * (index ** 2) / 2;
+    }
+
+    return f;
+}
+
+export function toFixed(number, i)
+{
+    if (Number.isInteger(number))
+    {
+        return number;
+    }
+
+    return number.toFixed(i);
+}
+
 export class Stack 
 {
     constructor()

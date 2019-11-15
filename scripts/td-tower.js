@@ -1,6 +1,6 @@
 import { CTargetSelectNoSort } from "./td-target-select-algorithm.js";
 import { distance, assert } from "./td-utils.js";
-import { UpgradeOptions } from "./td-tower-factory.js"
+import { UpgradeOptions, getOptionValue } from "./td-tower-factory.js"
  
 export class ITower
 {
@@ -15,7 +15,7 @@ export class ITower
 
     get range()
     {
-        return this.upgradeOptions.get(UpgradeOptions.range).currentValue;
+        return getOptionValue(this.upgradeOptions.get(UpgradeOptions.range));
     }
 }
 
@@ -126,17 +126,17 @@ export class CTower extends ITower
 
     get damage()
     {
-        return this.upgradeOptions.get(UpgradeOptions.damage).currentValue;
+        return getOptionValue(this.upgradeOptions.get(UpgradeOptions.damage));
     }
 
     get rocketSpeed()
     {
-        return this.upgradeOptions.get(UpgradeOptions.rocketSpeed).currentValue;
+        return getOptionValue(this.upgradeOptions.get(UpgradeOptions.rocketSpeed));
     }
 
     get reloadTime()
     {
-        return this.upgradeOptions.get(UpgradeOptions.reloadTime).currentValue;
+        return getOptionValue(this.upgradeOptions.get(UpgradeOptions.reloadTime));
     }
 
     setPlace(tilesX, tilesY)
@@ -201,7 +201,20 @@ export class CTower extends ITower
         this.rotation = Math.atan2(dy, dx);
     }
 
-    upgrade() {}
+    upgrade(upgradeOption)
+    {
+        const option = this.upgradeOptions.get(upgradeOption);
+        assert(option);
+
+        assert(option.currentLevel < option.maxLevel);
+
+        option.currentLevel++;
+    }
+
+    getUpgradeOptions()
+    {
+        return this.upgradeOptions;
+    }
 
     display(display) 
     {

@@ -38,23 +38,40 @@
             </svg>
           </div>
         </div>
-        <div id="game-builds-menu" class="flex-container">
+        <div id="game-builds-menu" class="flex-container game-menu right-menu">
           <!-- place for build options -->
         </div>  
 
         <!-- build option template is for cloning only and will never be displayed by itself-->
-        <div id="build-option-template" class="build-option center">
+        <div id="build-option-template" class="option center">
           <canvas class='build-option-canvas margin-auto' width=64 height=64></canvas>
           <p2 class="build-option-name">Rocket Tower</p2>
           <p3 class="build-option-damage block">Damage: </p3>
           <p3 class="build-option-range block">Range: </p3>
           <p3 class="build-option-reload-speed block">Reload: </p3>
-          <div class="build-option-price">
+          <div class="option-price">
               <img src="images/coin.png" width="20px" height="20px"></img>
               <p3 class="build-coins-value">100</p3>
           </div>
         </div>
         <!-- build-option-template end -->
+
+        <div id="game-upgrade-menu" class="flex-container game-menu left-menu flex-wrap">
+          <!-- place for upgrade options -->
+        </div>
+
+        <!-- upgrade-option-template -->
+        <div id="upgrade-option-template" class="option center">
+            <img class="upgrade-option-icon" src="/images/upgrades/damage.png" width=60 height=60/>
+            <p2 class="upgrade-option-name block">Damage</p2>
+            <p3 class="upgrade-option-value block">Value: </p3>
+            <p3 class="upgrade-option-level block">Level: </p3>
+            <div class="option-price">
+                <img src="images/coin.png" width="20px" height="20px"></img>
+                <p3 class="upgrade-option-price-value">100</p3>
+            </div>
+          </div>
+        <!-- upgrade-option-template end -->
 
         <div id="game-right-footer" class="flex-container">
           <svg class="game-control" id="game-right-footer-pause-svg" >

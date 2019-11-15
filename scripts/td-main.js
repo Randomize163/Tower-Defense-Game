@@ -1,8 +1,8 @@
-import { assert } from './td-utils.js'
+import { assert, toFixed } from './td-utils.js'
 import { Display } from './td-display.js';
 import { CRandomLevel } from './td-level-random.js';
 import { AssetType, CKenneyAssetsCollection } from './td-asset.js';
-import { TowerType, CTowerFactory, UpgradeOptions } from './td-tower-factory.js';
+import { TowerType, CTowerFactory, UpgradeOptions, upgradeOptionToString, upgradeOptionIconPath, getOptionValue, getOptionCost } from './td-tower-factory.js';
 import { CEnemy } from './td-enemy.js';
 import { CEnemyAttack, generateWaveDescription } from './td-enemy-attack.js'
  
@@ -95,14 +95,14 @@ class CGameBuildMenu
         this.assets = assets;
         
         this.gameBuildsMenu = document.getElementById("game-builds-menu");
-        this.hideBuildsMenu();
+        this.hide();
 
         this.buildOptionTemplateElement = document.getElementById("build-option-template");
     }
 
     displayBuildsOptions(buildOptions, tileX, tileY)
     {
-        this.hideBuildsMenu();
+        this.hide();
         this.clearBuildsOptions();
         
 
@@ -120,9 +120,9 @@ class CGameBuildMenu
             newElement.querySelector('.build-option-name').innerHTML = buildDescription.name;
             newElement.querySelector('.build-coins-value').innerHTML = buildDescription.price;
 
-            newElement.querySelector('.build-option-damage').innerHTML += buildDescription.upgradeOptionsMap.get(UpgradeOptions.damage).currentValue;
-            newElement.querySelector('.build-option-range').innerHTML += buildDescription.upgradeOptionsMap.get(UpgradeOptions.range).currentValue;
-            newElement.querySelector('.build-option-reload-speed').innerHTML += buildDescription.upgradeOptionsMap.get(UpgradeOptions.reloadTime).currentValue;
+            newElement.querySelector('.build-option-damage').innerHTML += getOptionValue(buildDescription.upgradeOptionsMap.get(UpgradeOptions.damage));
+            newElement.querySelector('.build-option-range').innerHTML += getOptionValue(buildDescription.upgradeOptionsMap.get(UpgradeOptions.range));
+            newElement.querySelector('.build-option-reload-speed').innerHTML += getOptionValue(buildDescription.upgradeOptionsMap.get(UpgradeOptions.reloadTime));
 
             newElement.onclick = () => {
                 gameManager.onBuildTowerClick(buildDescription, buildType, tileX, tileY);
@@ -132,7 +132,7 @@ class CGameBuildMenu
             this.gameBuildsMenu.appendChild(newElement);
         });
 
-        this.showBuildsMenu();
+        this.show();
     }
 
     displayBuildPicture(ctx, width, height, assetType)
@@ -147,14 +147,80 @@ class CGameBuildMenu
         this.gameBuildsMenu.innerHTML = '';
     }
 
-    hideBuildsMenu()
+    hide()
     {
         this.gameBuildsMenu.style.display = 'none';
     }
 
-    showBuildsMenu()
+    show()
     {
         this.gameBuildsMenu.style.display = 'block';
+    }
+}
+
+class CGameUpgradesMenu 
+{
+    constructor()
+    {
+        this.menu = document.getElementById("game-upgrade-menu");
+        this.hide();
+
+        this.optionTemplateElement = document.getElementById("upgrade-option-template");
+    }
+
+    displayUpgradeOptions(options, tileX, tileY)
+    {
+        this.clear();
+
+        options.forEach((params, upgradeOption) => {
+            const newElement = this.optionTemplateElement.cloneNode(true);
+
+            newElement.removeAttribute('id');
+            newElement.querySelector('.upgrade-option-name').innerHTML = upgradeOptionToString(upgradeOption);
+            newElement.querySelector('.upgrade-option-value').innerHTML += toFixed(getOptionValue(params), 3);
+            newElement.querySelector('.upgrade-option-level').innerHTML += `${params.currentLevel} / ${params.maxLevel}`;
+            newElement.querySelector('.upgrade-option-price-value').innerHTML = getOptionCost(params);
+            newElement.querySelector('.upgrade-option-icon').src = upgradeOptionIconPath(upgradeOption);
+
+            if (params.currentLevel < params.maxLevel)
+            {
+                if (gameManager.coins < getOptionCost(params))
+                {
+                    newElement.querySelector('.upgrade-option-price-value').style.color = "red";
+                }
+                else
+                {
+                    newElement.onclick = () => {
+                        gameManager.onUpgradeTowerClick([upgradeOption, params], tileX, tileY);
+                    };
+                }
+            }
+            else
+            {
+                newElement.querySelector('.option-price').innerHTML = '';
+            }
+
+            newElement.style.display = 'block';
+            this.menu.appendChild(newElement);
+        });
+
+        this.show(); 
+    }
+
+    show() 
+    {
+        this.menu.style.display = 'block';
+    }
+
+    hide()
+    {
+        this.menu.style.display = 'none';
+    }
+
+    clear()
+    {
+        // remove all children
+        this.menu.innerHTML = '';
     }
 }
 
@@ -250,6 +316,7 @@ class GameManager
         this.display = new Display(this.ctx, this.assets, this.canvasMinimizedWidth, this.canvasMinimizedHeight, this.level.width, this.level.height);
         
         this.buildMenu = new CGameBuildMenu(this.assets);
+        this.upgradeMenu = new CGameUpgradesMenu();
         
         this.footer.hidePauseButton();
         this.footer.showPlayButton();
@@ -345,6 +412,19 @@ class GameManager
         window.cancelAnimationFrame(this.loopCancelationId);
     }
 
+    onUpgradeTowerClick([upgradeOption, params], tileX, tileY)
+    {
+        if (this.gameState != GameState.running) return;
+
+        if (this.coins < getOptionCost(params)) return;
+
+        const tower = this.towersMap[tileX][tileY];
+        this.coins -= getOptionCost(params);
+        tower.upgrade(upgradeOption);
+
+        this.upgradeMenu.displayUpgradeOptions(tower.getUpgradeOptions(), tileX, tileY);
+    }
+
     onWheel(event)
     {
         const tileSizeDelta = -event.deltaY * 0.05;
@@ -395,7 +475,8 @@ class GameManager
         const coordinate = this.getMouseCoordinateOnCanvas(event);
         if (!this.display.coordinateIsOnPicture(coordinate[0], coordinate[1]))
         {
-            this.buildMenu.hideBuildsMenu();
+            this.buildMenu.hide();
+            this.upgradeMenu.hide();
             return;
         }
 
@@ -403,15 +484,24 @@ class GameManager
         tileX = Math.floor(tileX);
         tileY = Math.floor(tileY);
 
-        if (this.level.isPossibleToBuildOnTile(tileX, tileY) && !this.towersMap[tileX][tileY])
+        const tower = this.towersMap[tileX][tileY];
+        if (this.level.isPossibleToBuildOnTile(tileX, tileY) && !tower)
         {
             const buildOptions = this.towerFactory.getBuildTowerOptions();
             this.buildMenu.displayBuildsOptions(buildOptions, tileX, tileY);
+            this.upgradeMenu.hide();
         }
         else
+        if (tower)
         {
-            this.buildMenu.hideBuildsMenu();
-        }   
+            this.buildMenu.hide();
+            this.upgradeMenu.displayUpgradeOptions(tower.getUpgradeOptions(), tileX, tileY);
+        } 
+        else 
+        {
+            this.buildMenu.hide();
+            this.upgradeMenu.hide();
+        }
     }
 
     onBuildTowerClick(buildDescription, buildType, tileX, tileY)
@@ -434,7 +524,7 @@ class GameManager
 
         this.coins -= buildDescription.price;
 
-        this.buildMenu.hideBuildsMenu();
+        this.buildMenu.hide();
     }
 
     onPauseClick()

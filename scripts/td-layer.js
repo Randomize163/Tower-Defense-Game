@@ -1,12 +1,9 @@
 import { AssetType } from "./td-asset.js";
-import { IDisplayable } from "./td-displayable.js";
 
-export class ILayer extends IDisplayable
+export class ILayer
 {
     constructor(width, height)
     {
-        super();
-
         this.width = width;
         this.height = height;
 

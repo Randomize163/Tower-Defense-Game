@@ -1,19 +1,16 @@
-import { IGameObject } from "./td-gameobject.js";
-import { CircleCollider } from "./td-collider.js";
 import { assert, distance, equalsFloats } from "./td-utils.js";
 
-export class CEnemy extends IGameObject
+export class CEnemy
 {
     constructor(x, y, rotation, speed, hp, killBonus, radius, assetType)
     {
-        super();
         this.maxHp = hp 
         this.hp = hp;
         this.speed = speed;
         this.killBonus = killBonus;
         this.tilesX = x;
         this.tilesY = y;
-        this.collider = new CircleCollider(this, radius);
+        //this.collider = new CircleCollider(this, radius);
         this.rotation = rotation;
         this.assetType = assetType;
 

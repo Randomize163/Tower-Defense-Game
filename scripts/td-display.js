@@ -1,59 +1,6 @@
 import { assert } from "./td-utils.js";
 import { AssetType } from "./td-asset.js"
 
-export class Camera
-{
-    constructor(width, height, tileSize = 64, offsetX = 0, offsetY = 0, maxTilesX, maxTilesY)
-    {
-        this.maxTilesX = maxTilesX;
-        this.maxTilesY = maxTilesY;
-        this.update(offsetX, offsetY, width, height, tileSize);
-    }
-
-    update(offsetX, offsetY, width, height, tileSize)
-    {
-        this.offsetX = offsetX;
-        this.offsetY = offsetY;
-
-        this.width = width;
-        this.height = height;
-
-        this.tileSize = tileSize;
-
-        this.updateDependantMembers();
-    }
-
-    updateDependantMembers()
-    {
-        this.firstTileIndexX = Math.floor(this.offsetX / this.tileSize);
-        this.firstTileIndexY = Math.floor(this.offsetY / this.tileSize);
-
-        this.lastTileIndexX = Math.floor((this.offsetX + this.width) / this.tileSize);
-        this.lastTileIndexY = Math.floor((this.offsetY + this.height) / this.tileSize);
-    }
-
-    changeResolution(width, height)
-    {
-        this.width = width;
-        this.height = height;
-
-        this.updateDependantMembers();
-    }
-
-    moveCamera(stepX, stepY)
-    {
-        assert(false); // Not Impl
-    }
-
-    changeTileSize(tileSize)
-    {
-        const minTileSize = this.width / this.maxTilesX; 
-        this.tileSize = Math.max(tileSize, minTileSize);
-
-        this.updateDependantMembers();
-    }
-}
-
 export class Display
 {
     constructor(ctx, assets, width, height, tilesX, tilesY)

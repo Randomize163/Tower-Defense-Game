@@ -4,7 +4,6 @@ import { CRandomDecorationsLayer } from "./td-layer-decorations.js";
 import { CKenneyAssetsCollection, AssetType } from "./td-asset.js";
 import { ILevel } from "./td-level.js";
 import { sleep } from "./td-utils.js";
-import { Camera } from "./td-camera.js";
 
 export class CRandomLevel extends ILevel
 {

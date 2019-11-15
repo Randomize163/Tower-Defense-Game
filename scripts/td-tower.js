@@ -1,10 +1,8 @@
-import { IGameObject } from "./td-gameobject.js";
-import { AssetType } from "./td-asset.js";
 import { CTargetSelectNoSort } from "./td-target-select-algorithm.js";
 import { distance, assert } from "./td-utils.js";
 import { UpgradeOptions } from "./td-tower-factory.js"
  
-export class ITower extends IGameObject
+export class ITower
 {
     //
     // upgradeOptions = {{upgradeType, cost, currentLevel, maxLevel}}
@@ -21,11 +19,10 @@ export class ITower extends IGameObject
     }
 }
 
-export class CBullet extends IGameObject
+export class CBullet
 {
     constructor(targetEnemy, damage, speed, timeToLive, tilesX, tilesY, assetType)
     {
-        super();
         this.enemy = targetEnemy;
         this.damage = damage;
         this.timeToLive = timeToLive;

@@ -30,26 +30,6 @@ export const AssetType = Object.freeze(
 
 export class IAssetCollection
 {
-    constructor(name, src)
-    {
-        this.src = src;
-        this.name = name;
-    }
-
-    //
-    // initialize - loads image (and initialize datastructures)
-    //
-    async initialize()
-    {
-        return AssetLoader.loadImage(this.name, this.src).then(
-            image => {this.image = image},
-            error => {
-                console.log(error);
-                debugger;
-            }
-        );
-    }
-
     //
     // getAsset - returns asset with size, position and image object
     //
@@ -69,9 +49,182 @@ export class CKenneyAssetsCollection extends IAssetCollection
 {
     constructor()
     {
-        super('kenney', 'images/tower-defense-tilesheet-kenney.png');
+        super();
+        this.src = 'images/tower-defense-tilesheet-kenney.png';
+        this.name = 'kenney';
         this.sTileWidth = 128;
         this.sTileHeight = 128;
+
+        this.assetMap = new Map([
+            [
+                AssetType.gunBullet,
+                {
+                    sx: this.sTileWidth * 19,
+                    sy: this.sTileHeight * 11,
+                }
+            ],
+            [
+                AssetType.gunTowerBase,
+                {
+                    sx: this.sTileWidth * 19,
+                    sy: this.sTileHeight * 7,
+                }
+            ],
+            [
+                AssetType.gunTowerHead,
+                {
+                    sx: this.sTileWidth * 19,
+                    sy: this.sTileHeight * 10,
+                }
+            ],
+            [
+                AssetType.smallRocket,
+                {
+                    sx: this.sTileWidth * 21,
+                    sy: this.sTileHeight * 10,
+                }
+            ],
+            [
+                AssetType.enemyTankWhite,
+                {
+                    sx: this.sTileWidth * 16,
+                    sy: this.sTileHeight * 11,
+                }
+            ],
+            [
+                AssetType.enemyTankGreen,
+                {
+                    sx: this.sTileWidth * 15,
+                    sy: this.sTileHeight * 11,
+                }
+            ],
+            [
+                AssetType.enemyBasic,
+                {
+                    sx: this.sTileWidth * 15,
+                    sy: this.sTileHeight * 10,
+                }
+            ],
+            [
+                AssetType.enemyBasicFast,
+                {
+                    sx: this.sTileWidth * 16,
+                    sy: this.sTileHeight * 10,
+                }
+            ],
+            [
+                AssetType.rocketTowerBase,
+                {
+                    sx: this.sTileWidth * 20,
+                    sy: this.sTileHeight * 7,
+                }
+            ],
+            [
+                AssetType.rocketTowerHeadTwoRockets,
+                {
+                    sx: this.sTileWidth * 20,
+                    sy: this.sTileHeight * 8,
+                }
+            ],
+            [
+                AssetType.rocketTowerHeadOneRocket,
+                {
+                    sx: this.sTileWidth * 19,
+                    sy: this.sTileHeight * 8,
+                }
+            ],
+            [
+                AssetType.endTile,
+                {
+                    sx: this.sTileWidth * 0,
+                    sy: this.sTileHeight * 0,
+                }
+            ],
+            [
+                AssetType.beginTile,
+                {
+                    sx: this.sTileWidth * 0,
+                    sy: this.sTileHeight * 1,
+                }
+            ],
+            [
+                AssetType.emptyTile,
+                {
+                    sx: this.sTileWidth * 22,
+                    sy: this.sTileHeight * 6,
+                }
+            ],
+            [
+                AssetType.roadTile,
+                {
+                    sx: this.sTileWidth * 21,
+                    sy: this.sTileHeight * 6,
+                }
+            ],
+            [
+                AssetType.towerTile,
+                {
+                    sx: this.sTileWidth * 20,
+                    sy: this.sTileHeight * 4,
+                }
+            ], 
+            [
+                AssetType.stone1Tile,
+                {
+                    sx: this.sTileWidth * 20,
+                    sy: this.sTileHeight * 5,
+                }
+            ], 
+            [
+                AssetType.stone2Tile,
+                {
+                    sx: this.sTileWidth * 21,
+                    sy: this.sTileHeight * 5,
+                }
+            ],   
+            [
+                AssetType.stone3Tile,
+                {
+                    sx: this.sTileWidth * 22,
+                    sy: this.sTileHeight * 5,
+                }
+            ],   
+            [
+                AssetType.bush1Tile,
+                {
+                    sx: this.sTileWidth * 15,
+                    sy: this.sTileHeight * 5,
+                }
+            ],  
+            [
+                AssetType.bush2Tile,
+                {
+                    sx: this.sTileWidth * 18,
+                    sy: this.sTileHeight * 5,
+                }
+            ],  
+            [
+                AssetType.bush3Tile,
+                {
+                    sx: this.sTileWidth * 19,
+                    sy: this.sTileHeight * 5,
+                }
+            ],  
+        ]);
+    }
+
+    //
+    // initialize - loads image (and initialize datastructures)
+    //
+    async initialize()
+    {
+        return AssetLoader.loadImage(this.name, this.src).then(
+            image => {this.image = image},
+            error => {
+                console.log(error);
+                debugger;
+            }
+        );
     }
 
     getAsset(type)
@@ -83,103 +236,16 @@ export class CKenneyAssetsCollection extends IAssetCollection
         asset.sWidth = this.sTileWidth;
         asset.sHeight = this.sTileHeight;
 
-        switch (type)
+        const a = this.assetMap.get(type);
+        if (!a)
         {
-            case AssetType.gunBullet:
-                asset.sx = this.sTileWidth * 19;
-                asset.sy = this.sTileHeight * 11;
-                break;
-            case AssetType.gunTowerBase:
-                asset.sx = this.sTileWidth * 19;
-                asset.sy = this.sTileHeight * 7;
-                break;
-            case AssetType.gunTowerHead:
-                asset.sx = this.sTileWidth * 19;
-                asset.sy = this.sTileHeight * 10;
-                break;
-            case AssetType.smallRocket:
-                asset.sx = this.sTileWidth * 21;
-                asset.sy = this.sTileHeight * 10;
-                break;
-            case AssetType.enemyTankWhite:
-                asset.sx = this.sTileWidth * 16;
-                asset.sy = this.sTileHeight * 11;
-                break;
-            case AssetType.enemyTankGreen:
-                asset.sx = this.sTileWidth * 15;
-                asset.sy = this.sTileHeight * 11;
-                break;
-            case AssetType.enemyBasic:
-                asset.sx = this.sTileWidth * 15 + 2;
-                asset.sy = this.sTileHeight * 10 + 2;
-                asset.sWidth = this.sTileWidth - 2;
-                asset.sHeight = this.sTileHeight - 2;
-                break;
-            case AssetType.enemyBasicFast:
-                asset.sx = this.sTileWidth * 16;
-                asset.sy = this.sTileHeight * 10;
-                break;
-            case AssetType.rocketTowerBase:
-                asset.sx = this.sTileWidth * 20;
-                asset.sy = this.sTileHeight * 7;
-                break;
-            case AssetType.rocketTowerHeadTwoRockets:
-                asset.sx = this.sTileWidth * 20;
-                asset.sy = this.sTileHeight * 8;
-                break;
-            case AssetType.rocketTowerHeadOneRocket:
-                asset.sx = this.sTileWidth * 19;
-                asset.sy = this.sTileHeight * 8;
-                break;
-            case AssetType.endTile: 
-                asset.sx = 0;
-                asset.sy = 0;
-                break;
-            case AssetType.beginTile:
-                asset.sx = 0;
-                asset.sy = 128;
-                break;
-            case AssetType.emptyTile:
-                asset.sx = this.sTileWidth * 22;
-                asset.sy = this.sTileHeight * 6;
-                break;
-            case AssetType.roadTile:
-                asset.sx = this.sTileWidth * 21;
-                asset.sy = this.sTileHeight * 6;
-                break;    
-            case AssetType.towerTile:
-                asset.sx = this.sTileWidth * 20;
-                asset.sy = this.sTileHeight * 4;
-                break;  
-            case AssetType.stone1Tile:
-                asset.sx = this.sTileWidth * 20;
-                asset.sy = this.sTileHeight * 5;
-                break;   
-            case AssetType.stone2Tile:
-                asset.sx = this.sTileWidth * 21;
-                asset.sy = this.sTileHeight * 5;
-                break;
-            case AssetType.stone3Tile:
-                asset.sx = this.sTileWidth * 22;
-                asset.sy = this.sTileHeight * 5;
-                break;
-            case AssetType.bush1Tile:
-                asset.sx = this.sTileWidth * 15;
-                asset.sy = this.sTileHeight * 5;
-                break;
-            case AssetType.bush2Tile:
-                asset.sx = this.sTileWidth * 18;
-                asset.sy = this.sTileHeight * 5;
-                break;
-            case AssetType.bush3Tile:
-                asset.sx = this.sTileWidth * 19;
-                asset.sy = this.sTileHeight * 5;
-                break;
-            default:
-                console.error("Unknown asset type");
-                debugger;
+            console.error("Unknown asset type");
+            debugger;
         }
-
+        
+        asset.sx = a.sx;
+        asset.sy = a.sy;
+        
         return asset;
     }
 }

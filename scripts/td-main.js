@@ -1,5 +1,5 @@
 import { assert } from './td-utils.js'
-import { Camera, Display } from './td-camera.js';
+import { Display } from './td-display.js';
 import { CRandomLevel } from './td-level-random.js';
 import { AssetType, CKenneyAssetsCollection } from './td-asset.js';
 import { TowerType, CTowerFactory, UpgradeOptions } from './td-tower-factory.js';
@@ -283,7 +283,6 @@ class GameManager
     hit(damage = 1)
     {
         this.hp = Math.max(this.hp - damage, 0);
-        console.log(this.hp);
 
         if (this.hp == 0)
         {

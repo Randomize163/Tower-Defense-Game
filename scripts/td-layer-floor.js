@@ -2,7 +2,6 @@ import {ILayer} from './td-layer.js';
 import {CMaze} from './td-maze.js';
 import { AssetType, CKenneyAssetsCollection } from './td-asset.js';
 import { getNeighboursCoordinates, randomBoolWithProbability, sleep } from './td-utils.js';
-import { Camera } from './td-camera.js';
 
 export class CRandomFloorLayer extends ILayer
 {

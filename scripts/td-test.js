@@ -4,7 +4,6 @@ import {CFloorLayerTest} from './td-layer-floor.js';
 import {CDecorationsLayerTest} from './td-layer-decorations.js';
 import { CRandomLevelTest, CRandomLevel } from './td-level-random.js';
 import { CKenneyAssetsCollection, AssetType } from './td-asset.js';
-import { Camera } from './td-camera.js';
 import { CRocketTower, CBullet } from './td-tower.js';
 import { CEnemy } from './td-enemy.js';
 import { CTargetSelectNoSort, CTargetSelectHighestHp } from './td-target-select-algorithm.js';

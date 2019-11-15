@@ -1,7 +1,6 @@
 import {ILayer} from './td-layer.js';
 import {randomChoice, sleep} from './td-utils.js';
 import {AssetType, CKenneyAssetsCollection} from './td-asset.js';
-import { Camera } from './td-camera.js';
 
 const decorationsFillFactorDefault = 
 [

@@ -13,6 +13,8 @@ export class ITower
 
     setAimAlgorithm(aimAlgorithm) {}
 
+    getAimAlgorithm() {}
+
     get range()
     {
         return getOptionValue(this.upgradeOptions.get(UpgradeOptions.range));
@@ -148,6 +150,11 @@ export class CTower extends ITower
     setAimAlgorithm(algo)
     {
         this.aimAlgorithm = algo;
+    }
+
+    getAimAlgorithm() 
+    {
+        return this.aimAlgorithm;
     }
 
     calculate(deltaTime, enemies) {   

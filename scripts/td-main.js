@@ -5,6 +5,7 @@ import { AssetType, CKenneyAssetsCollection } from './td-asset.js';
 import { TowerType, CTowerFactory, UpgradeOptions, upgradeOptionToString, upgradeOptionIconPath, getOptionValue, getOptionCost } from './td-tower-factory.js';
 import { CEnemy } from './td-enemy.js';
 import { CEnemyAttack, generateWaveDescription } from './td-enemy-attack.js'
+import { AimAlgorithm, getAimAlgorithmOfType } from './td-target-select-algorithm.js';
  
 const ScreenState = Object.freeze(
 {
@@ -166,6 +167,8 @@ class CGameUpgradesMenu
         this.hide();
 
         this.optionTemplateElement = document.getElementById("upgrade-option-template");
+        this.optionRemoveTemplateElement = document.getElementById("upgrade-option-remove-template");
+        this.optionAlgorithmTemplateElement = document.getElementById("upgrade-option-algorithm-template");
     }
 
     displayUpgradeOptions(options, tileX, tileY)
@@ -190,9 +193,7 @@ class CGameUpgradesMenu
                 }
                 else
                 {
-                    newElement.onclick = () => {
-                        gameManager.onUpgradeTowerClick([upgradeOption, params], tileX, tileY);
-                    };
+                    newElement.onclick = () => gameManager.onUpgradeTowerClick([upgradeOption, params], tileX, tileY);
                 }
             }
             else
@@ -203,6 +204,32 @@ class CGameUpgradesMenu
             newElement.style.display = 'block';
             this.menu.appendChild(newElement);
         });
+
+        {
+            // Add algorithm
+            const newElement = this.optionAlgorithmTemplateElement.cloneNode(true);
+            newElement.removeAttribute('id');
+
+            const tower = gameManager.towersMap[tileX][tileY];
+            const algo = tower.getAimAlgorithm();
+
+            newElement.querySelector('.upgrade-option-algorithm-value').innerHTML = algo.getDescription();
+            newElement.onclick = () => gameManager.onNextAimAlgorithmClick(tileX, tileY);
+
+            newElement.style.display = 'block';
+            this.menu.appendChild(newElement);
+        }
+
+        {
+            // Add remove
+            const newElement = this.optionRemoveTemplateElement.cloneNode(true);
+            newElement.removeAttribute('id');
+
+            newElement.onclick = () => gameManager.onRemoveTowerClick(tileX, tileY);
+
+            newElement.style.display = 'block';
+            this.menu.appendChild(newElement);
+        }
 
         this.show(); 
     }
@@ -410,6 +437,36 @@ class GameManager
     stopGameLoop()
     {
         window.cancelAnimationFrame(this.loopCancelationId);
+    }
+
+    onNextAimAlgorithmClick(tileX, tileY)
+    {
+        if (this.gameState != GameState.running) return;
+
+        const tower = this.towersMap[tileX][tileY];
+        const algoType = tower.getAimAlgorithm().getType();
+        const nextAlgoType = (algoType + 1) % AimAlgorithm.MAX;
+
+        tower.setAimAlgorithm(getAimAlgorithmOfType(nextAlgoType));
+
+        this.upgradeMenu.displayUpgradeOptions(tower.getUpgradeOptions(), tileX, tileY);
+    }
+
+    onRemoveTowerClick(tileX, tileY)
+    {
+        if (this.gameState != GameState.running) return;
+
+        const tower = this.towersMap[tileX][tileY];
+        
+        const idx = this.towers.indexOf(tower);
+        assert(idx !== -1);
+        
+        const removed = this.towers.splice(idx, 1);
+        assert(removed[0] === tower);
+
+        this.towersMap[tileX][tileY] = null;
+
+        this.upgradeMenu.hide();
     }
 
     onUpgradeTowerClick([upgradeOption, params], tileX, tileY)

@@ -143,7 +143,12 @@ p3 {
     justify-content: center;
 }
 
-#game-upgrade-menu {
+#upgrade-option-remove-template {
+    display: none;
+} 
+
+#upgrade-option-algorithm-template {
+    display: none;
 } 
 
 .left-menu {
